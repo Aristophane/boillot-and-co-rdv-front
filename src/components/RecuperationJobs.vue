@@ -31,7 +31,7 @@
     <div v-if="error" style="color: red">{{ error }}</div>
     <div v-if="isVisible">
       <h3>Jobs Data:</h3>
-      <pre>{{ jobsReceived }}</pre>
+      <Jobs :jobs="jobsReceived"></Jobs>
     </div>
   </div>
 </template>
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { Ref } from "vue";
-// import Jobs from "./Jobs.vue";
+import Jobs from "./Jobs.vue";
 import { Job, ResponseDataForJobs } from "../types/JobTypes";
 const isVisible = ref<boolean>(false);
 const phone = ref<string>("");

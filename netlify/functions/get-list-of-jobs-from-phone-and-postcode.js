@@ -37,12 +37,14 @@ const getContactIdFromPhoneAndPostCode = async (phone, postCode) => {
     },
   }).then((response) => response.json());
 
+  console.log("API called" + apiUrlForContactsByPhone);
+  console.log("FUNCTION //////// response:" + JSON.stringify(responseForContact));
   const data = responseForContact?.Result.filter(
     (contact) => contact.ContactPostCode === postCode
   );
 
   console.log("FUNCTION //////// postCode: " + postCode);
-  console.log(responseForContact);
+
   //TODO ajouter la gestion du fait qu'avoir plusieurs résultats doit stopper le processus
 
   return data[0].ContactId;
