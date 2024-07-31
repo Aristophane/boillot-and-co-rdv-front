@@ -17,7 +17,7 @@ export const handler = async (event, context) => {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ responseForJobs }),
+    body: JSON.stringify({ responseForJobs, clientId }),
   };
 };
 
@@ -41,6 +41,8 @@ const getContactIdFromPhoneAndPostCode = async (phone, postCode) => {
     (contact) => contact.ContactPostCode === postCode
   );
 
+  console.log("FUNCTION //////// postCode: " + postCode);
+  console.log(responseForContact);
   //TODO ajouter la gestion du fait qu'avoir plusieurs résultats doit stopper le processus
 
   return data[0].ContactId;
