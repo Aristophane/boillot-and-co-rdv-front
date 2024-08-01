@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h1>Prenez RDV</h1>
+    <h1>Prenez Rendez-Vous</h1>
+    <h3>Planifiez l'intervention des équipes Boillot & Co, à l'heure qui vous convient le mieux</h3>
+    <p>Afin de retrouver vos intervention veuillez insérer votre numéro de téléphone et le code postal du logement ou se déroulera l'intervention</p>
     <label for="phone">Numéro de téléphone :</label>
     <input
       type="tel"
@@ -11,7 +13,8 @@
       placeholder="+33102030405"
       required
     />
-    <small>Entrez un numéro de téléphone à 10 chiffres</small>
+    <br />
+    <p>Entrez un numéro de téléphone à 10 chiffres</p>
     <br /><br />
 
     <label for="postcode">Code postal :</label>
@@ -24,13 +27,14 @@
       placeholder="75001"
       required
     />
-    <small>Entrez un code postal à 5 chiffres</small>
+    <br />
+    <p>Entrez un code postal à 5 chiffres</p>
     <br /><br />
 
-    <button @click="fetchData">Fetch Jobs</button>
+    <button @click="fetchData">Valider</button>
     <div v-if="error" style="color: red">{{ error }}</div>
     <div v-if="isVisible">
-      <h3>Jobs Data:</h3>
+      <h3>Liste des jobs à planifier:</h3>
       <Jobs :jobs="jobsReceived"></Jobs>
     </div>
   </div>
@@ -71,7 +75,7 @@ const fetchData = async () => {
     data.value = await response.json();
     isVisible.value = true;
     const result = data.value;
-    if (result !== undefined) {
+    if (result !== undefined ) {
       jobsReceived.value = result.responseForJobs.Result;
     }
     console.log(
@@ -92,7 +96,7 @@ body {
   padding: 20px;
 }
 h1 {
-  color: #333;
+  color: #b3b3b3;
 }
 button {
   background-color: #4caf50;

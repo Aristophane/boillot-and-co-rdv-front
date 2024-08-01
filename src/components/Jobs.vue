@@ -1,11 +1,25 @@
 <template>
-  <ul @click="selectJob" class="jobItem" v-for="job in jobs">
-    <li>Job Ref : {{ job.Ref }}</li>
-    <li>Job Id : {{ job.JobId }}</li>
-    <li>Description : {{ job.Description }}</li>
-    <li>Type : {{ job.Type }}</li>
-    <li>Localisation : {{ job.Location }}</li>
-  </ul>
+  <table>
+    <thead>
+      <tr>
+        <th class="jobColumnTitle">Job Ref</th>
+        <th class="jobColumnTitle">Job Id</th>
+        <th class="jobColumnTitle">Description</th>
+        <th class="jobColumnTitle">Type</th>
+        <th class="jobColumnTitle">Localisation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="job in jobs">
+        <td>{{ job.Ref }}</td>
+        <td>{{ job.JobId }}</td>
+        <td>{{ job.Description }}</td>
+        <td>{{ job.Type }}</td>
+        <td>{{ job.Location }}</td>
+        <button @click="planifierJob(job.Ref)"> Planifier </button>
+      </tr>
+    </tbody>
+  </table>
 </template>
 
 <script setup lang="ts">
@@ -13,9 +27,9 @@ import { Job } from "../types/JobTypes";
 
 defineProps<{ jobs: Job[] }>();
 
-const selectJob = () =>{
-  
-}
+const planifierJob = (jobRef: string) => {
+  console.log(jobRef);
+};
 </script>
 
 <style scoped>
@@ -32,16 +46,19 @@ th {
   background-color: #f4f4f4;
 }
 
-li{
+li {
   list-style-type: none;
 }
 
-.jobItem{
+.jobItem {
   background: #0087ff;
 }
 
-.jobItem:hover{
+.jobItem:hover {
   background: #00e5ff;
 }
 
+.jobColumnTitle {
+  background-color: transparent;
+}
 </style>
