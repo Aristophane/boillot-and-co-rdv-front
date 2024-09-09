@@ -5,7 +5,7 @@ const BIGCHANGE_BASE_API = `https://webservice.bigchangeapps.com/v01/services.as
 
 export const handler = async (event, context) => {
   const params = event.queryStringParameters;
-  const phoneNumber = params.phone; // Remplacer 'param1' par le nom de votre paramètre
+  const phoneNumber = params.phone; 
   const postCode = params.postCode;
   const formattedPhoneNumber = replacePlusWithEncodedPlus(phoneNumber);
   const clientId = await getContactIdFromPhoneAndPostCode(
@@ -50,31 +50,6 @@ const getContactIdFromPhoneAndPostCode = async (phone, postCode) => {
   //TODO ajouter la gestion du fait qu'avoir plusieurs résultats doit stopper le processus
 
   return data[0].ContactId;
-};
-
-const getSkills = async () => {
-  const SKILLS_METHOD = "&action=Attributes&AttributeType=1";
-  const skillsUrl = `${BIGCHANGE_BASE_API}${SKILLS_METHOD}`;
-  return await fetch(skillsUrl, {
-    method: "GET",
-    headers: {
-      Authorization: authInfo,
-    },
-  }).then((responseForJobs) => responseForJobs.json());
-};
-
-const getSillIdFromName = async (skillName) => {
-  const skills = await getSkills();
-  if (skills !== null) {
-    const skill = skills.Result.filter((attribute) => attribute.AttributeName === skillName);
-    if(skill !== null)
-    {
-      return skill.AttributeId;
-    }
-  }
-
-  //TODO Handle ERRORS
-  return null;
 };
 
 const getJobListFromContactId = async (clientId) => {
