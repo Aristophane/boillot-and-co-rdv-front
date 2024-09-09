@@ -38,7 +38,9 @@ const getContactIdFromPhoneAndPostCode = async (phone, postCode) => {
   }).then((response) => response.json());
 
   console.log("API called" + apiUrlForContactsByPhone);
-  console.log("FUNCTION //////// response:" + JSON.stringify(responseForContact));
+  console.log(
+    "FUNCTION //////// response:" + JSON.stringify(responseForContact)
+  );
   const data = responseForContact?.Result.filter(
     (contact) => contact.ContactPostCode === postCode
   );
@@ -48,6 +50,31 @@ const getContactIdFromPhoneAndPostCode = async (phone, postCode) => {
   //TODO ajouter la gestion du fait qu'avoir plusieurs résultats doit stopper le processus
 
   return data[0].ContactId;
+};
+
+const getSkills = async () => {
+  const SKILLS_METHOD = "&action=Attributes&AttributeType=1";
+  const skillsUrl = `${BIGCHANGE_BASE_API}${SKILLS_METHOD}`;
+  return await fetch(skillsUrl, {
+    method: "GET",
+    headers: {
+      Authorization: authInfo,
+    },
+  }).then((responseForJobs) => responseForJobs.json());
+};
+
+const getSillIdFromName = async (skillName) => {
+  const skills = await getSkills();
+  if (skills !== null) {
+    const skill = skills.Result.filter((attribute) => attribute.AttributeName === skillName);
+    if(skill !== null)
+    {
+      return skill.AttributeId;
+    }
+  }
+
+  //TODO Handle ERRORS
+  return null;
 };
 
 const getJobListFromContactId = async (clientId) => {

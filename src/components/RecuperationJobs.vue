@@ -1,8 +1,14 @@
 <template>
   <div>
     <h1>Prenez Rendez-Vous</h1>
-    <h3>Planifiez l'intervention des équipes Boillot & Co, à l'heure qui vous convient le mieux</h3>
-    <p>Afin de retrouver vos intervention veuillez insérer votre numéro de téléphone et le code postal du logement ou se déroulera l'intervention</p>
+    <h3>
+      Planifiez l'intervention des équipes Boillot & Co, à l'heure qui vous
+      convient le mieux
+    </h3>
+    <p>
+      Afin de retrouver vos intervention veuillez insérer votre numéro de
+      téléphone et le code postal du logement ou se déroulera l'intervention
+    </p>
     <label for="phone">Numéro de téléphone :</label>
     <input
       type="tel"
@@ -33,7 +39,7 @@
 
     <button @click="fetchData">Valider</button>
     <div v-if="error" style="color: red">{{ error }}</div>
-    <div v-if="isVisible">
+    <div v-if="isJobsVisible">
       <h3>Liste des jobs à planifier:</h3>
       <Jobs :jobs="jobsReceived"></Jobs>
     </div>
@@ -45,7 +51,7 @@ import { ref } from "vue";
 import type { Ref } from "vue";
 import Jobs from "./Jobs.vue";
 import { Job, ResponseDataForJobs } from "../types/JobTypes";
-const isVisible = ref<boolean>(false);
+const isJobsVisible = ref<boolean>(false);
 const phone = ref<string>("");
 const postcode = ref<string>("");
 const error = ref<string | null>(null);
@@ -73,9 +79,9 @@ const fetchData = async () => {
     }
 
     data.value = await response.json();
-    isVisible.value = true;
+    isJobsVisible.value = true;
     const result = data.value;
-    if (result !== undefined ) {
+    if (result !== undefined) {
       jobsReceived.value = result.responseForJobs.Result;
     }
     console.log(

@@ -16,19 +16,21 @@
         <td>{{ job.Description }}</td>
         <td>{{ job.Type }}</td>
         <td>{{ job.Location }}</td>
-        <button @click="planifierJob(job.Ref)"> Planifier </button>
+        <button @click="planifierJob(job.Ref)">Planifier</button>
       </tr>
     </tbody>
   </table>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import { Job } from "../types/JobTypes";
 
 defineProps<{ jobs: Job[] }>();
+const isVisible = ref<boolean>(false);
 
 const planifierJob = (jobRef: string) => {
-  console.log(jobRef);
+  isVisible.value = !isVisible.value;
 };
 </script>
 
