@@ -30,3 +30,22 @@ export interface Job {
     clientId: number;
   }
   
+  export interface ScheduleJobResult {
+    resourceid: number;
+    resourcereference: string | null;
+    resourcename: string;
+    resourcegroupname: string;
+    resourceskill: string[];  // Tableau de compétences
+    starttime: string;        // Format de date et heure
+    extradistance: string;    // Distance supplémentaire sous forme de chaîne (peut-être pour des raisons de précision)
+    extradriving: number;     // Distance de conduite supplémentaire
+    jobcost: string;          // Coût du travail (string car il semble être au format "0.00")
+    averageduration: string | null;  // Durée moyenne (nullable)
+    successrate: string | null;      // Taux de réussite (nullable)
+    punctuality: string | null;      // Ponctualité (nullable)
+  }
+  
+  export interface ScheduleJob {
+    Code: number;
+    Result: ScheduleJobResult[];
+  }

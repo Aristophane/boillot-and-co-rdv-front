@@ -5,72 +5,74 @@ const BIGCHANGE_BASE_API = `https://webservice.bigchangeapps.com/v01/services.as
 
 export const handler = async (event, context) => {
   const params = event.queryStringParameters;
-  const skillId = params.skillId;
+  const skillType = params.skillType;
   const latitude = params.latitude;
   const longitude = params.longitude;
   const jobId = params.jobId;
 
-const scheduleJob = await scheduleJobs(skillId, latitude, longitude, jobId);
+  const skillId = await getSillIdFromName(skillType);
+  const scheduleJob = await scheduleJobs(skillId, latitude, longitude, jobId);
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ scheduleJob  }),
+    body: JSON.stringify({ scheduleJob }),
   };
 };
 
-
 const scheduleJobs = async (skillId, latitude, longitude, jobId) => {
-    const SCHEDULEJOB_METHOD = "&action=JobSchedulingAssistant&schedulingType=1";
-    const startDate = getCurrentDateWithOffset(0);
-    const endDate = getCurrentDateWithOffset(7);
-    const apiUrlForScheduling = `${BIGCHANGE_BASE_API}${SCHEDULEJOB_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}`;
-  
-    const rdvForJob = await fetch(apiUrlForScheduling, {
-      method: "GET",
-      headers: {
-        Authorization: authInfo,
-      },
-    }).then((response) => response.json());
-  
-    console.log(
-      "FUNCTION SCHEDULE //////// response:" + JSON.stringify(rdvForJob)
+  const SCHEDULEJOB_METHOD = "&action=JobSchedulingAssistant&schedulingType=1";
+  const startDate = getCurrentDateWithOffset(0);
+  const endDate = getCurrentDateWithOffset(7);
+  console.log("skillID ------ " + skillId);
+  const apiUrlForScheduling = `${BIGCHANGE_BASE_API}${SCHEDULEJOB_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}&skills=${skillId}`;
+
+  const rdvForJob = await fetch(apiUrlForScheduling, {
+    method: "GET",
+    headers: {
+      Authorization: authInfo,
+    },
+  }).then((response) => response.json());
+
+  console.log(
+    "FUNCTION SCHEDULE //////// response:" + JSON.stringify(rdvForJob)
+  );
+
+  return rdvForJob;
+};
+
+const getSkills = async () => {
+  const SKILLS_METHOD = "&action=Attributes&AttributeType=1";
+  const skillsUrl = `${BIGCHANGE_BASE_API}${SKILLS_METHOD}`;
+  return await fetch(skillsUrl, {
+    method: "GET",
+    headers: {
+      Authorization: authInfo,
+    },
+  }).then((responseForJobs) => responseForJobs.json());
+};
+
+const getSillIdFromName = async (skillName) => {
+  const skills = await getSkills();
+  if (skills !== null) {
+    const skill = skills.Result.filter(
+      (attribute) => attribute.AttributeName === skillName
     );
-  
-    return rdvForJob;
-  };
-
-  const getSkills = async () => {
-    const SKILLS_METHOD = "&action=Attributes&AttributeType=1";
-    const skillsUrl = `${BIGCHANGE_BASE_API}${SKILLS_METHOD}`;
-    return await fetch(skillsUrl, {
-      method: "GET",
-      headers: {
-        Authorization: authInfo,
-      },
-    }).then((responseForJobs) => responseForJobs.json());
-  };
-  
-  const getSillIdFromName = async (skillName) => {
-    const skills = await getSkills();
-    if (skills !== null) {
-      const skill = skills.Result.filter((attribute) => attribute.AttributeName === skillName);
-      if(skill !== null)
-      {
-        return skill.AttributeId;
-      }
+    if (skill !== null) {
+      return skill[0].AttributeId;
     }
-  
-    //TODO Handle ERRORS
-    return null;
-  };
+  }
 
-  function getCurrentDateWithOffset(offsetDays) {
-    const today = new Date();
-    today.setDate(today.getDate() + offsetDays);
+  //TODO Handle ERRORS
+  return null;
+};
 
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    
-    return `${year}-${month}-${day}`;
+function getCurrentDateWithOffset(offsetDays) {
+  const today = new Date();
+  today.setDate(today.getDate() + offsetDays);
+
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
