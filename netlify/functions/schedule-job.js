@@ -32,7 +32,6 @@ const scheduleJobs = async (skillId, latitude, longitude, jobId) => {
       },
     }).then((response) => response.json());
   
-    console.log("API called" + apiUrlForContactsByPhone);
     console.log(
       "FUNCTION SCHEDULE //////// response:" + JSON.stringify(rdvForJob)
     );

@@ -17,6 +17,7 @@
         <td>{{ job.Type }}</td>
         <td>{{ job.Location }}</td>
         <button @click="planifierJob(job)">Planifier</button>
+        <p v-if="isSchedulingVisible">{{ possibleDates }}</p>
       </tr>
     </tbody>
   </table>
@@ -27,10 +28,35 @@ import { ref } from "vue";
 import { Job } from "../types/JobTypes";
 
 defineProps<{ jobs: Job[] }>();
-const isVisible = ref<boolean>(false);
 
-const planifierJob = (job: Job) => {
-  isVisible.value = !isVisible.value;
+const isSchedulingVisible = ref<boolean>(false);
+const possibleDates = ref<string>("");
+const planifierJob = async (job: Job) => {
+  const scheduleJobAPIUrl = `/.netlify/functions/schedule-job`;
+
+  const params = new URLSearchParams({
+    //TODO removeSkillId
+    skillId: "80833",
+    latitude: job.JobContactLatitude,
+    longitude: job.JobContactLongitude,
+    jobId: job.JobId.toString(),
+  });
+
+  try {
+    const response = await fetch(`${scheduleJobAPIUrl}?${params}`);
+    if (!response.ok) {
+      throw new Error(`Erreur : ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    isSchedulingVisible.value = true;
+    possibleDates.value = result.scheduleJob.Result[0].starttime;
+    console.log(
+      "FRONT  schedule Received        ------" + JSON.stringify(result)
+    );
+  } catch (err) {
+    console.log(err);
+  }
 };
 </script>
 

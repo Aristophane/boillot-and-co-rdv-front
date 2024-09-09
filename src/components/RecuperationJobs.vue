@@ -64,7 +64,7 @@ const replacePlusWithEncodedPlus = (inputString: string): string => {
 };
 
 const fetchData = async () => {
-  const apiUrl = `/.netlify/functions/get-list-of-jobs-from-phone-and-postcode`;
+  const getJobsListApiUrl = `/.netlify/functions/get-list-of-jobs-from-phone-and-postcode`;
 
   const cleanedPhone = replacePlusWithEncodedPlus(phone.value);
   const params = new URLSearchParams({
@@ -73,7 +73,7 @@ const fetchData = async () => {
   });
 
   try {
-    const response = await fetch(`${apiUrl}?${params}`);
+    const response = await fetch(`${getJobsListApiUrl}?${params}`);
     if (!response.ok) {
       throw new Error(`Erreur : ${response.statusText}`);
     }
@@ -84,9 +84,7 @@ const fetchData = async () => {
     if (result !== undefined) {
       jobsReceived.value = result.responseForJobs.Result;
     }
-    console.log(
-      "FRONT  jobsRECEIVED        ------" + JSON.stringify(jobsReceived.value)
-    );
+    
     error.value = null;
   } catch (err) {
     error.value = (err as Error).message;
