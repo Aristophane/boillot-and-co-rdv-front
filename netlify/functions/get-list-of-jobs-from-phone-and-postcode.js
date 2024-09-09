@@ -78,9 +78,10 @@ const getSillIdFromName = async (skillName) => {
 };
 
 const getJobListFromContactId = async (clientId) => {
-  const JOBLIST_METHOD =
-    "&action=JobsListByContactPaged&V2=1&page=0&pageSize=500";
-  const apiUrlForJobList = `${BIGCHANGE_BASE_API}${JOBLIST_METHOD}&contactId=${clientId}`;
+  //TODO remplacer les dates de début et de fin
+  const JOBSLIST_METHOD =
+    "&action=JobsList&Start=2024-01-01&End=2024-12-12";
+  const apiUrlForJobList = `${BIGCHANGE_BASE_API}${JOBSLIST_METHOD}&contactId=${clientId}`;
   const responseForJobs = await fetch(apiUrlForJobList, {
     method: "GET",
     headers: {

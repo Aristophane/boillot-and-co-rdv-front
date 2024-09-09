@@ -9,6 +9,8 @@ export interface Job {
     ContactGoupId: number;
     Postcode: string;
     Location: string;
+    JobContactLatitude: string;
+    JobContactLongitude: string;
     Duration: string;
     Status: string;
     StatusId: number;

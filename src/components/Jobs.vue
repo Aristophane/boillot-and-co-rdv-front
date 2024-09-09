@@ -16,7 +16,7 @@
         <td>{{ job.Description }}</td>
         <td>{{ job.Type }}</td>
         <td>{{ job.Location }}</td>
-        <button @click="planifierJob(job.Ref)">Planifier</button>
+        <button @click="planifierJob(job)">Planifier</button>
       </tr>
     </tbody>
   </table>
@@ -29,7 +29,7 @@ import { Job } from "../types/JobTypes";
 defineProps<{ jobs: Job[] }>();
 const isVisible = ref<boolean>(false);
 
-const planifierJob = (jobRef: string) => {
+const planifierJob = (job: Job) => {
   isVisible.value = !isVisible.value;
 };
 </script>
