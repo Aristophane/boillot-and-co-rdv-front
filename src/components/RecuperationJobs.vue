@@ -1,43 +1,46 @@
 <template>
   <div>
-    <h1>Prenez Rendez-Vous</h1>
-    <h3>
-      Planifiez l'intervention des équipes Boillot & Co, à l'heure qui vous
+    <h2>
+      Planifiez l'intervention de nos équipes à l'heure qui vous
       convient le mieux
-    </h3>
-    <p>
+    </h2>
+    <h3>
       Afin de retrouver vos intervention veuillez insérer votre numéro de
       téléphone et le code postal du logement ou se déroulera l'intervention
-    </p>
-    <label for="phone">Numéro de téléphone :</label>
-    <input
-      type="tel"
-      id="clientPhone"
-      v-model="phone"
-      name="phone"
-      pattern="\+[0-9]{10,15}"
-      placeholder="+33102030405"
-      required
-    />
-    <br />
-    <p>Entrez un numéro de téléphone à 10 chiffres</p>
-    <br /><br />
-
-    <label for="postcode">Code postal :</label>
-    <input
-      type="text"
-      id="postcode"
-      v-model="postcode"
-      name="postcode"
-      pattern="[0-9]{5}"
-      placeholder="75001"
-      required
-    />
-    <br />
-    <p>Entrez un code postal à 5 chiffres</p>
-    <br /><br />
-
-    <button @click="fetchData">Valider</button>
+    </h3>
+    <div className="flexRow">
+      <div>
+        <label for="phone">Numéro de téléphone : </label>
+        <input
+          type="tel"
+          id="clientPhone"
+          v-model="phone"
+          name="phone"
+          pattern="\+[0-9]{10,15}"
+          placeholder="+33102030405"
+          required
+        />
+        <p>Entrez un numéro de téléphone à 10 chiffres</p>
+      </div>
+      <div>
+        <label for="postcode">Code postal : </label>
+        <input
+          type="text"
+          id="postcode"
+          v-model="postcode"
+          name="postcode"
+          pattern="[0-9]{5}"
+          placeholder="75001"
+          required
+        />
+        <br />
+        <p>Entrez un code postal à 5 chiffres</p>
+      </div>
+    </div>
+    <button @click="fetchData" :disabled="isJobsLoading">
+      {{ isJobsLoading ? "Chargement..." : "Valider" }}
+    </button>
+    <div v-if="isJobsLoading" class="loader">Chargement des interventions</div>
     <div v-if="error" style="color: red">{{ error }}</div>
     <div v-if="isJobsVisible">
       <h3>Liste des jobs à planifier:</h3>
@@ -51,7 +54,9 @@ import { ref } from "vue";
 import type { Ref } from "vue";
 import Jobs from "./Jobs.vue";
 import { Job, ResponseDataForJobs } from "../types/JobTypes";
+
 const isJobsVisible = ref<boolean>(false);
+const isJobsLoading = ref(false);
 const phone = ref<string>("");
 const postcode = ref<string>("");
 const error = ref<string | null>(null);
@@ -64,6 +69,7 @@ const replacePlusWithEncodedPlus = (inputString: string): string => {
 };
 
 const fetchData = async () => {
+  isJobsLoading.value = true;
   const getJobsListApiUrl = `/.netlify/functions/get-list-of-jobs-from-phone-and-postcode`;
 
   const cleanedPhone = replacePlusWithEncodedPlus(phone.value);
@@ -84,10 +90,12 @@ const fetchData = async () => {
     if (result !== undefined) {
       jobsReceived.value = result.responseForJobs.Result;
     }
-    
+
     error.value = null;
   } catch (err) {
     error.value = (err as Error).message;
+  } finally {
+    isJobsLoading.value = false;
   }
 };
 </script>
@@ -117,5 +125,20 @@ button {
 p {
   font-size: 14px;
   color: #666;
+}
+
+.flexRow {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 2em;
+}
+
+.loader {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
 }
 </style>

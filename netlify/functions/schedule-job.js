@@ -21,9 +21,9 @@ export const handler = async (event, context) => {
 
 const scheduleJobs = async (skillId, latitude, longitude, jobId) => {
   const SCHEDULEJOB_METHOD = "&action=JobSchedulingAssistant&schedulingType=1";
-  const startDate = getCurrentDateWithOffset(0);
-  const endDate = getCurrentDateWithOffset(7);
-  console.log("skillID ------ " + skillId);
+  //On set un délai d'une semaine pour planifier le RDV
+  const startDate = getCurrentDateWithOffset(1);
+  const endDate = getCurrentDateWithOffset(8);
   const apiUrlForScheduling = `${BIGCHANGE_BASE_API}${SCHEDULEJOB_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}&skills=${skillId}`;
 
   const rdvForJob = await fetch(apiUrlForScheduling, {

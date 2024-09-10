@@ -20,6 +20,7 @@ export interface Job {
     DrivingDist: number;
     Actioned: string;
     Created: string;
+    IsLoadingPlanification: boolean;
   }
   
   export interface ResponseDataForJobs {
