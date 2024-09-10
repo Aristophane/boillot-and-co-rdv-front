@@ -12,7 +12,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="job in jobs">
+      <tr :class="getRowClass(job)" v-for="job in jobs">
         <td>{{ job.Ref }}</td>
         <td>{{ job.JobId }}</td>
         <td>{{ formatTime(job.Duration) }}</td>
@@ -20,13 +20,18 @@
         <td>{{ job.Type }}</td>
         <td>{{ job.Location }}</td>
         <td>{{ transformStatus(job.Status) }}</td>
-        <button @click="planifierJob(job)" :disabled="job.IsLoadingPlanification">
-          {{ job.IsLoadingPlanification ? "Chargement..." : "Planifier" }}
-        </button>
+        <td>
+          <button
+            @click="planifierJob(job)"
+            :disabled="job.IsLoadingPlanification"
+          >
+            {{ job.IsLoadingPlanification ? "Chargement..." : "Planifier" }}
+          </button>
+        </td>
       </tr>
     </tbody>
   </table>
-  <ul v-if="isSchedulingVisible" >
+  <ul v-if="isSchedulingVisible">
     <li v-for="item in possibleDates">
       <CreneauRdv :date="item"></CreneauRdv>
     </li>
@@ -39,13 +44,19 @@ import { Job } from "../types/JobTypes";
 import { ScheduleJobResult } from "../types/JobTypes";
 import CreneauRdv from "./CreneauRdv.vue";
 
-defineProps<{ jobs: Job[] }>();
+const props = defineProps<{ jobs: Job[] }>();
 
 const isSchedulingVisible = ref<boolean>(false);
 const possibleDates = ref<string[]>([""]);
 
+const resetJobStatus = (jobs: Job[]) => {
+  jobs.forEach((job) => (job.IsJobSelected = false));
+};
+
 const planifierJob = async (job: Job) => {
+  resetJobStatus(props.jobs);
   job.IsLoadingPlanification = true;
+  job.IsJobSelected = true;
   const scheduleJobAPIUrl = `/.netlify/functions/schedule-job`;
 
   const params = new URLSearchParams({
@@ -77,6 +88,10 @@ const planifierJob = async (job: Job) => {
   }
 };
 
+const getRowClass = (job: Job): string => {
+  return job.IsJobSelected ? "selected-job" : "";
+};
+
 const formatTime = (time: string): string => {
   const [hours, minutes] = time.split(":").map(Number);
   if (hours === 0) {
@@ -86,18 +101,17 @@ const formatTime = (time: string): string => {
 };
 
 function transformStatus(status: string): string {
-  // Dictionnaire des correspondances
   const statusMapping: { [key: string]: string } = {
-    "New": "Non planifié",
-    "Scheduled": "Planifiée",
-    "Unscheduled": "Non planifiée",
-    "Sent": "Envoyée",
-    "Refused": "Refusée",
-    "OnTheWay": "En chemin",
-    "Started": "Commencée",
-    "Suspended": "Suspendue",
-    "CompletedOk": "Terminée avec succès",
-    "CompletedNO": "Terminée sans succès"
+    New: "Non planifié",
+    Scheduled: "Planifiée",
+    Unscheduled: "Non planifiée",
+    Sent: "Envoyée",
+    Refused: "Refusée",
+    OnTheWay: "En chemin",
+    Started: "Commencée",
+    Suspended: "Suspendue",
+    CompletedOk: "Terminée avec succès",
+    CompletedNO: "Terminée sans succès",
   };
 
   // Si le statut existe dans le dictionnaire, le transformer, sinon retourner l'original
@@ -125,7 +139,7 @@ ul {
   flex-direction: row;
 }
 
-li{
+li {
   width: 50%;
 }
 
@@ -139,5 +153,9 @@ li{
 
 .jobColumnTitle {
   background-color: transparent;
+}
+
+.selected-job {
+  background-color: rgb(84, 84, 84);
 }
 </style>

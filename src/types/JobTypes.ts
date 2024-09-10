@@ -21,6 +21,7 @@ export interface Job {
     Actioned: string;
     Created: string;
     IsLoadingPlanification: boolean;
+    IsJobSelected: boolean;
   }
   
   export interface ResponseDataForJobs {
