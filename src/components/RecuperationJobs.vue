@@ -16,11 +16,11 @@
           id="clientPhone"
           v-model="phone"
           name="phone"
-          pattern="\+[0-9]{10,15}"
+          pattern="^(?:\+|00)?(?:[0-9]{2})?\s?[0-9]{1,2}(\s?[0-9]{2}){4,5}$"
           placeholder="+33102030405"
           required
         />
-        <p>Entrez un numéro de téléphone à 10 chiffres</p>
+        <p>Entrez votre numéro de téléphone</p>
       </div>
       <div>
         <label for="postcode">Code postal : </label>
@@ -34,7 +34,7 @@
           required
         />
         <br />
-        <p>Entrez un code postal à 5 chiffres</p>
+        <p>Entrez le code postal de votre location</p>
       </div>
     </div>
     <button @click="fetchData" :disabled="isJobsLoading">
@@ -68,11 +68,28 @@ const replacePlusWithEncodedPlus = (inputString: string): string => {
   return inputString.replace(/\+/g, "%2B");
 };
 
+const cleanPhoneNumber = (phoneInput: string): string => {
+  const phonePattern = /^0(6|7)(\d{8})$/;
+  
+  // Teste si le numéro correspond au pattern
+  const match = phoneInput.match(phonePattern);
+  
+  if (match) {
+    // Remplace le 0 initial par +33 pour transformer en numéro international
+    var result = `+33${match[1]}${match[2]}`;
+    return replacePlusWithEncodedPlus(result);
+  } else {
+    throw new Error("Le numéro n'est pas au format 06xxxxxxxx ou 07xxxxxxxx");
+  }
+
+
+}
+
 const fetchData = async () => {
   isJobsLoading.value = true;
   const getJobsListApiUrl = `/.netlify/functions/get-list-of-jobs-from-phone-and-postcode`;
 
-  const cleanedPhone = replacePlusWithEncodedPlus(phone.value);
+  const cleanedPhone = cleanPhoneNumber(phone.value);
   const params = new URLSearchParams({
     phone: cleanedPhone,
     postCode: postcode.value,
