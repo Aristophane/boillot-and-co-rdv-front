@@ -25,7 +25,7 @@
             @click="planifierJob(job)"
             :disabled="job.IsLoadingPlanification"
           >
-            {{ job.IsLoadingPlanification ? "Chargement..." : "Planifier" }}
+            {{ getButtonLibelle(job) }}
           </button>
         </td>
       </tr>
@@ -100,7 +100,7 @@ const formatTime = (time: string): string => {
   return `${hours}h${minutes > 0 ? minutes : "00"}`;
 };
 
-function transformStatus(status: string): string {
+const transformStatus = (status: string): string => {
   const statusMapping: { [key: string]: string } = {
     New: "Non planifié",
     Scheduled: "Planifiée",
@@ -116,7 +116,19 @@ function transformStatus(status: string): string {
 
   // Si le statut existe dans le dictionnaire, le transformer, sinon retourner l'original
   return statusMapping[status] || status;
-}
+};
+
+const getButtonLibelle = (job: Job): string => {
+  if (job.IsLoadingPlanification) {
+    return "Chargement";
+  } 
+  
+  if (job.IsJobSelected) {
+    return "Planification en Cours";
+  } else {
+    return "Planifier";
+  }
+};
 </script>
 
 <style scoped>

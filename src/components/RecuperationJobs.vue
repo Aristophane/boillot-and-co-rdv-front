@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="jobsRecuperationContainer">
     <h2>
       Planifiez l'intervention de nos équipes à l'heure qui vous
       convient le mieux
@@ -140,5 +140,10 @@ p {
   margin-top: 10px;
   font-size: 14px;
   color: #333;
+}
+
+.jobsRecuperationContainer{
+  margin-left: 15%;
+  margin-right: 15%;
 }
 </style>
