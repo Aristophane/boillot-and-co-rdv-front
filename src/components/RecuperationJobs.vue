@@ -1,8 +1,8 @@
 <template>
   <div class="jobsRecuperationContainer">
     <h2>
-      Planifiez l'intervention de nos équipes à l'heure qui vous
-      convient le mieux
+      Planifiez l'intervention de nos équipes à l'heure qui vous convient le
+      mieux
     </h2>
     <h3>
       Afin de retrouver vos intervention veuillez insérer votre numéro de
@@ -70,32 +70,29 @@ const replacePlusWithEncodedPlus = (inputString: string): string => {
 
 const cleanPhoneNumber = (phoneInput: string): string => {
   const phonePattern = /^0(6|7)(\d{8})$/;
-  
+
   // Teste si le numéro correspond au pattern
   const match = phoneInput.match(phonePattern);
-  
+
   if (match) {
     // Remplace le 0 initial par +33 pour transformer en numéro international
     var result = `+33${match[1]}${match[2]}`;
     return replacePlusWithEncodedPlus(result);
   } else {
-    throw new Error("Le numéro n'est pas au format 06xxxxxxxx ou 07xxxxxxxx");
+    throw new Error("Le numéro de téléphone n'est pas au format 06xxxxxxxx ou 07xxxxxxxx ou +336xxxxxxxx ou ou +337xxxxxxxx");
   }
-
-
-}
+};
 
 const fetchData = async () => {
   isJobsLoading.value = true;
   const getJobsListApiUrl = `/.netlify/functions/get-list-of-jobs-from-phone-and-postcode`;
 
-  const cleanedPhone = cleanPhoneNumber(phone.value);
-  const params = new URLSearchParams({
-    phone: cleanedPhone,
-    postCode: postcode.value,
-  });
-
   try {
+    const cleanedPhone = cleanPhoneNumber(phone.value);
+    const params = new URLSearchParams({
+      phone: cleanedPhone,
+      postCode: postcode.value,
+    });
     const response = await fetch(`${getJobsListApiUrl}?${params}`);
     if (!response.ok) {
       throw new Error(`Erreur : ${response.statusText}`);
@@ -159,7 +156,7 @@ p {
   color: #333;
 }
 
-.jobsRecuperationContainer{
+.jobsRecuperationContainer {
   margin-left: 15%;
   margin-right: 15%;
 }
