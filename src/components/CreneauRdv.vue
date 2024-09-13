@@ -1,12 +1,16 @@
 <template>
-  <div class="creneauRdv">
-    <p>{{ formatDate(date) }}</p>
+  <div @click="scheduleJob()" class="creneauRdv" >
+    <p>{{ formatDate(jobInfo.date) }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{ date: string }>();
+import { SchedulingJobInfo } from '../types/JobTypes';
 
+const props = defineProps<{ jobInfo : SchedulingJobInfo}>();
+
+const scheduleJob = () => {
+}
 
 function formatDate(dateStr: string): string {
   // Dictionnaire des jours de la semaine et des mois en français
@@ -46,6 +50,10 @@ function formatDate(dateStr: string): string {
   text-align: center;
   align-content: center;
   width: 60%;
+  padding-left: 2em;
+  padding-right: 2em;
+  padding-top: 1em;
+  padding-bottom: 1em;
 }
 
 .creneauRdv>p:hover {

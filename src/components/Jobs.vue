@@ -1,5 +1,5 @@
 <template>
-  <table>
+  <table class="jobsTable">
     <thead>
       <tr>
         <th class="jobColumnTitle">Job Ref</th>
@@ -31,23 +31,24 @@
       </tr>
     </tbody>
   </table>
-  <ul v-if="isSchedulingVisible">
+  <ul v-if="isSchedulingVisible" class="creneauxJobs">
     <li v-for="item in possibleDates">
-      <CreneauRdv :date="item"></CreneauRdv>
+      <CreneauRdv :jobInfo="item"
+      ></CreneauRdv>
     </li>
   </ul>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Job } from "../types/JobTypes";
+import { Job, SchedulingJobInfo } from "../types/JobTypes";
 import { ScheduleJobResult } from "../types/JobTypes";
 import CreneauRdv from "./CreneauRdv.vue";
 
 const props = defineProps<{ jobs: Job[] }>();
 
 const isSchedulingVisible = ref<boolean>(false);
-const possibleDates = ref<string[]>([""]);
+const possibleDates = ref<SchedulingJobInfo[]>([]);
 
 const resetJobStatus = (jobs: Job[]) => {
   jobs.forEach((job) => (job.IsJobSelected = false));
@@ -57,7 +58,7 @@ const planifierJob = async (job: Job) => {
   resetJobStatus(props.jobs);
   job.IsLoadingPlanification = true;
   job.IsJobSelected = true;
-  const scheduleJobAPIUrl = `/.netlify/functions/schedule-job`;
+  const scheduleJobAPIUrl = `/.netlify/functions/scheduling-job-assistant`;
 
   const params = new URLSearchParams({
     skillType: job.Type,
@@ -67,7 +68,7 @@ const planifierJob = async (job: Job) => {
   });
 
   try {
-    possibleDates.value.length = 0;
+    possibleDates.value = [];
     const response = await fetch(`${scheduleJobAPIUrl}?${params}`);
     if (!response.ok) {
       throw new Error(`Erreur : ${response.statusText}`);
@@ -75,8 +76,16 @@ const planifierJob = async (job: Job) => {
 
     const result = await response.json();
     isSchedulingVisible.value = true;
+    const jobDurationInMinutes = convertirEnMinutes(job.Duration);
     result.scheduleJob.Result.forEach((element: ScheduleJobResult) => {
-      possibleDates.value?.push(element.starttime);
+      possibleDates.value?.push({
+        date: element.starttime,
+        resourceId: element.resourceid,
+        resourceReference: element.resourcereference,
+        jobId: job.JobId,
+        jobRef: job.Ref,
+        durationMins: jobDurationInMinutes
+      });
     });
     console.log(
       "FRONT  schedule Received        ------" + JSON.stringify(result)
@@ -100,6 +109,17 @@ const formatTime = (time: string): string => {
   return `${hours}h${minutes > 0 ? minutes : "00"}`;
 };
 
+const convertirEnMinutes = (heure: string): string => {
+  // Diviser la chaîne par les deux-points pour obtenir heures, minutes et secondes
+  const [heures, minutes, secondes] = heure.split(':').map(Number);
+
+  // Calculer les minutes totales
+  const totalMinutes = (heures * 60) + minutes + (secondes / 60);
+
+  // Retourner le nombre total de minutes
+  return Math.floor(totalMinutes).toString();
+}
+
 const transformStatus = (status: string): string => {
   const statusMapping: { [key: string]: string } = {
     New: "Non planifié",
@@ -121,8 +141,8 @@ const transformStatus = (status: string): string => {
 const getButtonLibelle = (job: Job): string => {
   if (job.IsLoadingPlanification) {
     return "Chargement";
-  } 
-  
+  }
+
   if (job.IsJobSelected) {
     return "Planification en Cours";
   } else {
@@ -149,6 +169,7 @@ ul {
   list-style-type: none;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 }
 
 li {
@@ -162,6 +183,9 @@ li {
 .jobItem:hover {
   background: #00e5ff;
 }
+.creneauxJobs {
+  margin-bottom: 3em;
+}
 
 .jobColumnTitle {
   background-color: transparent;
@@ -169,5 +193,9 @@ li {
 
 .selected-job {
   background-color: rgb(84, 84, 84);
+}
+
+.jobsTable {
+  margin-bottom: 3em;
 }
 </style>

@@ -5,8 +5,8 @@
       mieux
     </h2>
     <h3>
-      Afin de retrouver vos intervention veuillez insérer votre numéro de
-      téléphone et le code postal du logement ou se déroulera l'intervention
+      Afin de retrouver vos interventions veuillez insérer votre numéro de
+      téléphone et le code postal du logement où se déroulera l'intervention
     </h3>
     <div className="flexRow">
       <div>
@@ -64,24 +64,6 @@ const data: Ref<ResponseDataForJobs | undefined> = ref<
   ResponseDataForJobs | undefined
 >();
 const jobsReceived = ref<Job[]>([]);
-const replacePlusWithEncodedPlus = (inputString: string): string => {
-  return inputString.replace(/\+/g, "%2B");
-};
-
-const cleanPhoneNumber = (phoneInput: string): string => {
-  const phonePattern = /^0(6|7)(\d{8})$/;
-
-  // Teste si le numéro correspond au pattern
-  const match = phoneInput.match(phonePattern);
-
-  if (match) {
-    // Remplace le 0 initial par +33 pour transformer en numéro international
-    var result = `+33${match[1]}${match[2]}`;
-    return replacePlusWithEncodedPlus(result);
-  } else {
-    throw new Error("Le numéro de téléphone n'est pas au format 06xxxxxxxx ou 07xxxxxxxx ou +336xxxxxxxx ou ou +337xxxxxxxx");
-  }
-};
 
 const fetchData = async () => {
   isJobsLoading.value = true;
@@ -103,13 +85,32 @@ const fetchData = async () => {
     const result = data.value;
     if (result !== undefined) {
       jobsReceived.value = result.responseForJobs.Result;
-    }
-
-    error.value = null;
+    } else error.value = null;
   } catch (err) {
     error.value = (err as Error).message;
   } finally {
     isJobsLoading.value = false;
+  }
+};
+
+const replacePlusWithEncodedPlus = (inputString: string): string => {
+  return inputString.replace(/\+/g, "%2B");
+};
+
+const cleanPhoneNumber = (phoneInput: string): string => {
+  const phonePattern = /^0(6|7)(\d{8})$/;
+
+  // Teste si le numéro correspond au pattern
+  const match = phoneInput.match(phonePattern);
+
+  if (match) {
+    // Remplace le 0 initial par +33 pour transformer en numéro international
+    var result = `+33${match[1]}${match[2]}`;
+    return replacePlusWithEncodedPlus(result);
+  } else {
+    throw new Error(
+      "Le numéro de téléphone n'est pas au format 06xxxxxxxx ou 07xxxxxxxx ou +336xxxxxxxx ou ou +337xxxxxxxx"
+    );
   }
 };
 </script>

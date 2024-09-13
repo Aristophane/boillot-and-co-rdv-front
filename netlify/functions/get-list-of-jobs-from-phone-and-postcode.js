@@ -5,7 +5,7 @@ const BIGCHANGE_BASE_API = `https://webservice.bigchangeapps.com/v01/services.as
 
 export const handler = async (event, context) => {
   const params = event.queryStringParameters;
-  const phoneNumber = params.phone; 
+  const phoneNumber = params.phone;
   const postCode = params.postCode;
   const formattedPhoneNumber = replacePlusWithEncodedPlus(phoneNumber);
   const clientId = await getContactIdFromPhoneAndPostCode(
@@ -54,8 +54,7 @@ const getContactIdFromPhoneAndPostCode = async (phone, postCode) => {
 
 const getJobListFromContactId = async (clientId) => {
   //TODO remplacer les dates de début et de fin
-  const JOBSLIST_METHOD =
-    "&action=JobsList&Start=2024-01-01&End=2024-12-12";
+  const JOBSLIST_METHOD = "&action=JobsList&Start=2024-01-01&End=2024-12-12";
   const apiUrlForJobList = `${BIGCHANGE_BASE_API}${JOBSLIST_METHOD}&contactId=${clientId}`;
   const responseForJobs = await fetch(apiUrlForJobList, {
     method: "GET",
