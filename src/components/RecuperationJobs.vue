@@ -12,6 +12,7 @@
       <div>
         <label for="phone">Numéro de téléphone : </label>
         <input
+          class="clientInput"
           type="tel"
           id="clientPhone"
           v-model="phone"
@@ -25,6 +26,7 @@
       <div>
         <label for="postcode">Code postal : </label>
         <input
+          class="clientInput"
           type="text"
           id="postcode"
           v-model="postcode"
@@ -64,10 +66,10 @@ const data: Ref<ResponseDataForJobs | undefined> = ref<
   ResponseDataForJobs | undefined
 >();
 const jobsReceived = ref<Job[]>([]);
+const getJobsListApiUrl = `/.netlify/functions/get-list-of-jobs-from-phone-and-postcode`;
 
 const fetchData = async () => {
   isJobsLoading.value = true;
-  const getJobsListApiUrl = `/.netlify/functions/get-list-of-jobs-from-phone-and-postcode`;
 
   try {
     const cleanedPhone = cleanPhoneNumber(phone.value);
@@ -160,5 +162,9 @@ p {
 .jobsRecuperationContainer {
   margin-left: 15%;
   margin-right: 15%;
+}
+
+.clientInput {
+  height: 2em;
 }
 </style>

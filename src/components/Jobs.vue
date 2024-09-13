@@ -46,6 +46,7 @@ import { ScheduleJobResult } from "../types/JobTypes";
 import CreneauRdv from "./CreneauRdv.vue";
 
 const props = defineProps<{ jobs: Job[] }>();
+const scheduleJobAPIUrl = `/.netlify/functions/scheduling-job-assistant`;
 
 const isSchedulingVisible = ref<boolean>(false);
 const possibleDates = ref<SchedulingJobInfo[]>([]);
@@ -58,7 +59,6 @@ const planifierJob = async (job: Job) => {
   resetJobStatus(props.jobs);
   job.IsLoadingPlanification = true;
   job.IsJobSelected = true;
-  const scheduleJobAPIUrl = `/.netlify/functions/scheduling-job-assistant`;
 
   const params = new URLSearchParams({
     skillType: job.Type,
@@ -81,14 +81,14 @@ const planifierJob = async (job: Job) => {
       possibleDates.value?.push({
         date: element.starttime,
         resourceId: element.resourceid,
-        resourceReference: element.resourcereference,
+        resourceReference: element.resourcereference ?? "",
         jobId: job.JobId,
         jobRef: job.Ref,
         durationMins: jobDurationInMinutes
       });
     });
     console.log(
-      "FRONT  schedule Received        ------" + JSON.stringify(result)
+      "FRONT  schedule Assistant Received        ------" + JSON.stringify(result)
     );
   } catch (err) {
     console.log(err);
@@ -96,6 +96,10 @@ const planifierJob = async (job: Job) => {
     job.IsLoadingPlanification = false;
   }
 };
+
+function formatUndefinedString(value: string | null): string | undefined {
+  return value ?? undefined;
+}
 
 const getRowClass = (job: Job): string => {
   return job.IsJobSelected ? "selected-job" : "";

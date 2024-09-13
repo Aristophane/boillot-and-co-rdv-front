@@ -10,7 +10,7 @@ export const handler = async (event, context) => {
   const resourceId = params.resourceId;
   const resourceRef = params.resourceRef;
   const scheduleDate = params.scheduleDate;
-  const durationMins = params.duration;
+  const durationMins = params.durationMins;
 
   const scheduleJob = await scheduleJobs(
     jobId,

@@ -54,9 +54,9 @@ export interface ScheduleJob {
 
 export interface SchedulingJobInfo {
   date: string;
-  resourceId: number | null;
-  resourceReference: string | null;
+  resourceId: number;
+  resourceReference: string;
   jobId: number;
-  jobRef: string | null;
+  jobRef: string;
   durationMins: string;
 }
