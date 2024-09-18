@@ -2,29 +2,25 @@
   <table class="jobsTable">
     <thead>
       <tr>
-        <th class="jobColumnTitle">Job Ref</th>
-        <th class="jobColumnTitle">Job Id</th>
-        <th class="jobColumnTitle">Durée du job</th>
         <th class="jobColumnTitle">Description</th>
-        <th class="jobColumnTitle">Type</th>
         <th class="jobColumnTitle">Localisation</th>
         <th class="jobColumnTitle">Status</th>
       </tr>
     </thead>
     <tbody>
       <tr :class="getRowClass(job)" v-for="job in jobs">
-        <td>{{ job.Ref }}</td>
-        <td>{{ job.JobId }}</td>
-        <td>{{ formatTime(job.Duration) }}</td>
-        <td>{{ job.Description }}</td>
-        <td>{{ job.Type }}</td>
-        <td>{{ job.Location }}</td>
-        <td>{{ transformStatus(job.Status) }}</td>
         <td>
-          <button
-            @click="planifierJob(job)"
-            :disabled="job.IsLoadingPlanification"
-          >
+          {{ job.Type }} <br />
+          Durée {{ formatTime(job.Duration) }}
+        </td>
+        <td>{{ job.Location }}</td>
+        <td>
+          {{ transformStatus(job.Status) }} <br />{{
+            job.PlannedStart !== null ? formatDate(job.PlannedStart) : ""
+          }}
+        </td>
+        <td>
+          <button @click="planifierJob(job)" :disabled="isButtonDisabled(job)">
             {{ getButtonLibelle(job) }}
           </button>
         </td>
@@ -33,8 +29,7 @@
   </table>
   <ul v-if="isSchedulingVisible" class="creneauxJobs">
     <li v-for="item in possibleDates">
-      <CreneauRdv :jobInfo="item"
-      ></CreneauRdv>
+      <CreneauRdv :jobInfo="item"></CreneauRdv>
     </li>
   </ul>
 </template>
@@ -84,11 +79,12 @@ const planifierJob = async (job: Job) => {
         resourceReference: element.resourcereference ?? "",
         jobId: job.JobId,
         jobRef: job.Ref,
-        durationMins: jobDurationInMinutes
+        durationMins: jobDurationInMinutes,
       });
     });
     console.log(
-      "FRONT  schedule Assistant Received        ------" + JSON.stringify(result)
+      "FRONT  schedule Assistant Received        ------" +
+        JSON.stringify(result)
     );
   } catch (err) {
     console.log(err);
@@ -96,10 +92,6 @@ const planifierJob = async (job: Job) => {
     job.IsLoadingPlanification = false;
   }
 };
-
-function formatUndefinedString(value: string | null): string | undefined {
-  return value ?? undefined;
-}
 
 const getRowClass = (job: Job): string => {
   return job.IsJobSelected ? "selected-job" : "";
@@ -113,16 +105,59 @@ const formatTime = (time: string): string => {
   return `${hours}h${minutes > 0 ? minutes : "00"}`;
 };
 
+function formatDate(dateStr: string): string {
+  // Dictionnaire des jours de la semaine et des mois en français
+  const daysOfWeek = [
+    "Dimanche",
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
+  ];
+  const months = [
+    "Janvier",
+    "Février",
+    "Mars",
+    "Avril",
+    "Mai",
+    "Juin",
+    "Juillet",
+    "Août",
+    "Septembre",
+    "Octobre",
+    "Novembre",
+    "Décembre",
+  ];
+
+  // Convertir la chaîne en objet Date
+  const date = new Date(dateStr.replace(" ", "T")); // Remplacement de l'espace par un 'T' pour rendre la chaîne compatible avec le constructeur Date
+
+  // Extraire les différentes parties de la date
+  const dayName = daysOfWeek[date.getDay()];
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+
+  // Extraire l'heure et les minutes
+  const hours = date.getHours().toString().padStart(2, "0"); // Format avec deux chiffres
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+
+  // Retourner la date formatée
+  return `${dayName} ${day} ${month} ${year} à ${hours}h${minutes}`;
+}
+
 const convertirEnMinutes = (heure: string): string => {
   // Diviser la chaîne par les deux-points pour obtenir heures, minutes et secondes
-  const [heures, minutes, secondes] = heure.split(':').map(Number);
+  const [heures, minutes, secondes] = heure.split(":").map(Number);
 
   // Calculer les minutes totales
-  const totalMinutes = (heures * 60) + minutes + (secondes / 60);
+  const totalMinutes = heures * 60 + minutes + secondes / 60;
 
   // Retourner le nombre total de minutes
   return Math.floor(totalMinutes).toString();
-}
+};
 
 const transformStatus = (status: string): string => {
   const statusMapping: { [key: string]: string } = {
@@ -147,15 +182,30 @@ const getButtonLibelle = (job: Job): string => {
     return "Chargement";
   }
 
+  if (job.Status == "Scheduled") {
+    return "Planification effectué";
+  }
+
   if (job.IsJobSelected) {
     return "Planification en Cours";
   } else {
     return "Planifier";
   }
 };
+
+const isButtonDisabled = (job: Job) => {
+  return job.IsLoadingPlanification || job.Status != "New";
+};
 </script>
 
 <style scoped>
+@media (max-width: 812px) {
+  th,
+  td {
+    font-size: 0.7em;
+  }
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -174,6 +224,8 @@ ul {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  gap: 1em;
+  justify-content: center;
 }
 
 li {
@@ -189,6 +241,7 @@ li {
 }
 .creneauxJobs {
   margin-bottom: 3em;
+  padding: 0 0 0 0;
 }
 
 .jobColumnTitle {
@@ -196,7 +249,7 @@ li {
 }
 
 .selected-job {
-  background-color: rgb(84, 84, 84);
+  background-color: rgb(216, 216, 216);
 }
 
 .jobsTable {

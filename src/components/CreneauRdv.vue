@@ -109,6 +109,22 @@ function remplacerEspaces(url: string): string {
 </script>
 
 <style scoped>
+@media (max-width: 812px) {
+  .creneauRdv {
+    font-size: 0.8em;
+  }
+}
+
+@media (min-width: 812px) {
+  .creneauRdv > p {
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    width: 60%;
+  }
+}
+
 .creneauRdv {
   display: flex;
   align-items: center;
@@ -118,19 +134,15 @@ function remplacerEspaces(url: string): string {
 }
 
 .creneauRdv > p {
-  background-color: rgb(122, 122, 122);
+  background-color: rgb(206, 206, 206);
   height: 3em;
   text-align: center;
   align-content: center;
-  width: 60%;
-  padding-left: 2em;
-  padding-right: 2em;
-  padding-top: 1em;
-  padding-bottom: 1em;
+  padding: 1em;
 }
 
 .creneauRdv > p:hover {
-  background-color: rgb(83, 82, 82);
+  background-color: rgb(192, 192, 192);
 }
 
 .overlay {
@@ -190,7 +202,7 @@ function remplacerEspaces(url: string): string {
 }
 
 .popin-content {
-  background: rgb(75, 75, 75);
+  background: rgb(206, 206, 206);
   padding: 20px;
   border-radius: 10px;
   width: 300px;
@@ -204,7 +216,7 @@ function remplacerEspaces(url: string): string {
 
 .popin-content button {
   padding: 10px 20px;
-  background-color: #3498db;
+  background-color: #125ed6;
   color: white;
   border: none;
   border-radius: 5px;

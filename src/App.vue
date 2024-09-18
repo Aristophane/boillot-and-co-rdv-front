@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import RecuperationJobs from './components/RecuperationJobs.vue';
-import logo from './assets/logoBoillot.jpg'; // Importer l'image
+import RecuperationJobs from "./components/RecuperationJobs.vue";
+import logo from "./assets/logoBoillot.jpg"; // Importer l'image
 </script>
 
 <template>
   <header>
-    <h1>Prenez Rendez-Vous avec</h1>
+    <p>Prenez Rendez-Vous avec</p>
     <img :src="logo" alt="Exemple d'image" />
   </header>
-  <RecuperationJobs/>
+  <RecuperationJobs />
   <footer>
-    En cas de problème pour fixer le rendez-vous contactez nous au 06 06 06 06 06
+    En cas de problème pour fixer le rendez-vous contactez nous au 06 06 06 06
+    06
   </footer>
 </template>
 
 <style scoped>
-
 footer {
   position: fixed;
   bottom: 0;
@@ -40,11 +40,16 @@ footer {
   filter: drop-shadow(0 0 2em #42b883aa);
 }
 
-header{
+header {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 2em;
+  font-size: 3em;
+}
+
+header > p {
+  margin: 0px;
 }
 </style>

@@ -13,6 +13,7 @@ export interface Job {
   JobContactLongitude: string;
   Duration: string;
   Status: string;
+  PlannedStart: string;
   StatusId: number;
   StatusDate: string;
   DrivingDur: string;

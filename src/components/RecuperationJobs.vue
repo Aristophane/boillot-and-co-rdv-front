@@ -8,9 +8,9 @@
       Afin de retrouver vos interventions veuillez insérer votre numéro de
       téléphone et le code postal du logement où se déroulera l'intervention
     </h3>
-    <div className="flexRow">
-      <div>
-        <label for="phone">Numéro de téléphone : </label>
+    <div className="flexColumn">
+      <div class="flexRow">
+        <label for="phone">Numéro de téléphone: </label>
         <input
           class="clientInput"
           type="tel"
@@ -21,10 +21,9 @@
           placeholder="+33102030405"
           required
         />
-        <p>Entrez votre numéro de téléphone</p>
       </div>
-      <div>
-        <label for="postcode">Code postal : </label>
+      <div class="flexRow">
+        <label for="postcode">Code postal: </label>
         <input
           class="clientInput"
           type="text"
@@ -36,7 +35,6 @@
           required
         />
         <br />
-        <p>Entrez le code postal de votre location</p>
       </div>
     </div>
     <button @click="fetchData" :disabled="isJobsLoading">
@@ -70,9 +68,9 @@ const getJobsListApiUrl = `/.netlify/functions/get-list-of-jobs-from-phone-and-p
 
 const fetchData = async () => {
   isJobsLoading.value = true;
-
+  error.value = null;
   try {
-    const cleanedPhone = cleanPhoneNumber(phone.value);
+    const cleanedPhone = formatFrenchPhoneNumber(phone.value);
     const params = new URLSearchParams({
       phone: cleanedPhone,
       postCode: postcode.value,
@@ -95,26 +93,41 @@ const fetchData = async () => {
   }
 };
 
-const replacePlusWithEncodedPlus = (inputString: string): string => {
-  return inputString.replace(/\+/g, "%2B");
-};
+function formatFrenchPhoneNumber(phoneNumber: string): string {
+  // Supprimer tous les espaces, tirets, points et parenthèses
+  let cleaned = phoneNumber.replace(/[\s\-\(\)\.]/g, "");
 
-const cleanPhoneNumber = (phoneInput: string): string => {
-  const phonePattern = /^0(6|7)(\d{8})$/;
+  // Vérifier si le numéro commence par "00" (indicatif international)
+  if (cleaned.startsWith("00")) {
+    cleaned = "+" + cleaned.slice(2);
+  }
 
-  // Teste si le numéro correspond au pattern
-  const match = phoneInput.match(phonePattern);
+  // Vérifier si le numéro commence par "+"
+  if (cleaned.startsWith("+")) {
+    // Si c'est déjà en format international, vérifier que c'est bien français
+    if (cleaned.startsWith("+33")) {
+      return cleaned;
+    } else {
+      throw new Error("Ce numéro n'est pas un numéro français.");
+    }
+  }
 
-  if (match) {
-    // Remplace le 0 initial par +33 pour transformer en numéro international
-    var result = `+33${match[1]}${match[2]}`;
-    return replacePlusWithEncodedPlus(result);
+  // Vérifier si le numéro commence par un "0" (indicatif national français)
+  if (cleaned.startsWith("0")) {
+    cleaned = "+33" + cleaned.slice(1);
   } else {
+    throw new Error("Numéro non valide. Il doit commencer par '0' ou '+33'.");
+  }
+
+  // Vérifier que le numéro est bien de longueur correcte après transformation
+  if (cleaned.length !== 12) {
     throw new Error(
-      "Le numéro de téléphone n'est pas au format 06xxxxxxxx ou 07xxxxxxxx ou +336xxxxxxxx ou ou +337xxxxxxxx"
+      "Le numéro doit contenir 9 chiffres après l'indicatif '+33'."
     );
   }
-};
+
+  return cleaned;
+}
 </script>
 
 <style scoped>
@@ -128,7 +141,7 @@ h1 {
   color: #b3b3b3;
 }
 button {
-  background-color: #4caf50;
+  background-color: #125ed6;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -136,12 +149,21 @@ button {
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 10px 0;
+  margin: 2em 2em;
   cursor: pointer;
 }
 p {
   font-size: 14px;
   color: #666;
+}
+
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 2em;
 }
 
 .flexRow {
@@ -151,6 +173,7 @@ p {
   align-items: center;
   justify-content: center;
   gap: 2em;
+  flex-wrap: wrap;
 }
 
 .loader {
@@ -159,12 +182,38 @@ p {
   color: #333;
 }
 
+@media (min-width: 812px) {
+  .jobsRecuperationContainer {
+    margin-left: 15%;
+    margin-right: 15%;
+  }
+}
+
 .jobsRecuperationContainer {
-  margin-left: 15%;
-  margin-right: 15%;
+  margin-bottom: 5em;
 }
 
 .clientInput {
   height: 2em;
+}
+
+input[type="text"] {
+  text-align: center; /* Centre le texte horizontalement */
+  font-size: 16px;
+}
+
+/* Style du placeholder */
+input[type="text"]::placeholder {
+  text-align: center; /* Centre le texte horizontalement */
+}
+
+input[type="tel"] {
+  text-align: center; /* Centre le texte horizontalement */
+  font-size: 16px;
+}
+
+/* Style du placeholder */
+input[type="tel"]::placeholder {
+  text-align: center; /* Centre le texte horizontalement */
 }
 </style>
