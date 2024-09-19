@@ -16,6 +16,11 @@ import logo from "./assets/logoBoillot.jpg"; // Importer l'image
 </template>
 
 <style scoped>
+p{
+  font-family: 'Swiss', sans-serif;
+
+}
+
 footer {
   position: fixed;
   bottom: 0;
@@ -50,6 +55,6 @@ header {
 }
 
 header > p {
-  margin: 0px;
+  margin-top: 2em;
 }
 </style>

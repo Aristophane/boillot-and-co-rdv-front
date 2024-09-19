@@ -22,12 +22,11 @@
           required
         />
       </div>
-      <div class="flexRow">
+      <div id="postCode" class="flexRow">
         <label for="postcode">Code postal: </label>
         <input
           class="clientInput"
           type="text"
-          id="postcode"
           v-model="postcode"
           name="postcode"
           pattern="[0-9]{5}"
@@ -53,6 +52,7 @@
 import { ref } from "vue";
 import type { Ref } from "vue";
 import Jobs from "./Jobs.vue";
+import { scrollToElementById } from "../common/utils";
 import { Job, ResponseDataForJobs } from "../types/JobTypes";
 
 const isJobsVisible = ref<boolean>(false);
@@ -90,6 +90,7 @@ const fetchData = async () => {
     error.value = (err as Error).message;
   } finally {
     isJobsLoading.value = false;
+    scrollToElementById("jobs");
   }
 };
 
@@ -132,7 +133,7 @@ function formatFrenchPhoneNumber(phoneNumber: string): string {
 
 <style scoped>
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Swiss', sans-serif;
   background-color: #f0f0f0;
   margin: 0;
   padding: 20px;
@@ -186,6 +187,13 @@ p {
   .jobsRecuperationContainer {
     margin-left: 15%;
     margin-right: 15%;
+  }
+}
+
+@media (max-width: 811px) {
+  #postcode > label,
+  input {
+    width: 100%;
   }
 }
 
