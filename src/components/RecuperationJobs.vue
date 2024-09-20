@@ -70,6 +70,9 @@ const fetchData = async () => {
   isJobsLoading.value = true;
   error.value = null;
   try {
+    if (postcode.value.length == 0) {
+      throw new Error(`Merci d'indiquer le code postal de l'habitation`);
+    }
     const cleanedPhone = formatFrenchPhoneNumber(phone.value);
     const params = new URLSearchParams({
       phone: cleanedPhone,
@@ -79,7 +82,7 @@ const fetchData = async () => {
     if (!response.ok) {
       throw new Error(`Erreur : ${response.statusText}`);
     }
-
+ 
     data.value = await response.json();
     isJobsVisible.value = true;
     const result = data.value;
@@ -87,10 +90,12 @@ const fetchData = async () => {
       jobsReceived.value = result.responseForJobs.Result;
     } else error.value = null;
   } catch (err) {
+
     error.value = (err as Error).message;
   } finally {
     isJobsLoading.value = false;
-    scrollToElementById("jobs");
+  scrollToElementById("jobs");
+
   }
 };
 
@@ -133,7 +138,7 @@ function formatFrenchPhoneNumber(phoneNumber: string): string {
 
 <style scoped>
 body {
-  font-family: 'Swiss', sans-serif;
+  font-family: "Swiss", sans-serif;
   background-color: #f0f0f0;
   margin: 0;
   padding: 20px;

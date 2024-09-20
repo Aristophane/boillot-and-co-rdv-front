@@ -5,8 +5,7 @@ import logo from "./assets/logoBoillot.jpg"; // Importer l'image
 
 <template>
   <header>
-    <p>Prenez Rendez-Vous avec</p>
-    <img :src="logo" alt="Exemple d'image" />
+    <img :src="logo" alt="Logo de l'entreprise de réparation Boillot&Co" />
   </header>
   <RecuperationJobs />
   <footer>
@@ -16,9 +15,18 @@ import logo from "./assets/logoBoillot.jpg"; // Importer l'image
 </template>
 
 <style scoped>
-p{
-  font-family: 'Swiss', sans-serif;
+img {
+  width: 80%;
+}
 
+@media (min-width:650px) {
+  img {
+  width: 30%;
+}
+}
+
+p {
+  font-family: "Swiss", sans-serif;
 }
 
 footer {
@@ -55,6 +63,6 @@ header {
 }
 
 header > p {
-  margin-top: 2em;
+  margin-top: 2 em;
 }
 </style>

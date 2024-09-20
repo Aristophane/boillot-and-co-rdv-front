@@ -27,11 +27,16 @@
       </tr>
     </tbody>
   </table>
-  <ul id="creneauxId" v-if="isSchedulingVisible" class="creneauxJobs">
-    <li  v-for="item in possibleDates">
-      <CreneauRdv :jobInfo="item"></CreneauRdv>
-    </li>
-  </ul>
+  <div>
+    <div class="flexRow">
+      <h3 id="creneauxId">Liste des créneaux disponibles</h3>
+    </div>
+    <ul v-if="isSchedulingVisible" class="creneauxJobs">
+      <li v-for="item in possibleDates">
+        <CreneauRdv :jobInfo="item"></CreneauRdv>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -158,6 +163,15 @@ const isButtonDisabled = (job: Job) => {
 </script>
 
 <style scoped>
+.flexRow {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 812px) {
   th,
   td {

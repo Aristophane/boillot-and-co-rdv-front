@@ -93,7 +93,6 @@ function remplacerEspaces(url: string): string {
 
 .creneauRdv > p {
   background-color: rgb(206, 206, 206);
-  height: 3em;
   text-align: center;
   align-content: center;
   padding: 1em;
