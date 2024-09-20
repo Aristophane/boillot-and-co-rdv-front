@@ -11,7 +11,7 @@
       <tr :class="getRowClass(job)" v-for="job in jobs">
         <td>
           {{ job.Type }} <br />
-          Durée {{ formatTime(job.Duration) }}
+          Durée: {{ formatTime(job.Duration) }}
         </td>
         <td>{{ job.Location }}</td>
         <td>
@@ -28,12 +28,12 @@
     </tbody>
   </table>
   <div>
-    <div class="flexRow">
+    <div v-if="isSchedulingVisible" class="flexRow">
       <h3 id="creneauxId">Liste des créneaux disponibles</h3>
     </div>
     <ul v-if="isSchedulingVisible" class="creneauxJobs">
       <li v-for="item in possibleDates">
-        <CreneauRdv :jobInfo="item"></CreneauRdv>
+        <CreneauRdv @creneau-mounted="focusCreneaux" :jobInfo="item"></CreneauRdv>
       </li>
     </ul>
   </div>
@@ -41,10 +41,17 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { onMounted } from 'vue'; 
 import { Job, SchedulingJobInfo } from "../types/JobTypes";
 import { ScheduleJobResult } from "../types/JobTypes";
 import CreneauRdv from "./CreneauRdv.vue";
 import { scrollToElementById, formatDate } from "../common/utils";
+
+const emit = defineEmits(['jobs-mounted']);
+
+onMounted(()=>{
+  emit('jobs-mounted');
+})
 
 const props = defineProps<{ jobs: Job[] }>();
 const scheduleJobAPIUrl = `/.netlify/functions/scheduling-job-assistant`;
@@ -55,6 +62,10 @@ const possibleDates = ref<SchedulingJobInfo[]>([]);
 const resetJobStatus = (jobs: Job[]) => {
   jobs.forEach((job) => (job.IsJobSelected = false));
 };
+
+const focusCreneaux = ()=>{
+  scrollToElementById("creneauxId");
+}
 
 const planifierJob = async (job: Job) => {
   resetJobStatus(props.jobs);
@@ -125,7 +136,7 @@ const convertirEnMinutes = (heure: string): string => {
 
 const transformStatus = (status: string): string => {
   const statusMapping: { [key: string]: string } = {
-    New: "Non planifié",
+    New: "Non planifiée",
     Scheduled: "Planifiée",
     Unscheduled: "Non planifiée",
     Sent: "Envoyée",

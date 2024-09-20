@@ -19,14 +19,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { SchedulingJobInfo } from "../types/JobTypes";
 import { formatDate } from "../common/utils";
 
 const props = defineProps<{ jobInfo: SchedulingJobInfo }>();
+const emit = defineEmits(['creneau-mounted']);
 const scheduleJobAPIUrl = `/.netlify/functions/schedule-job`;
 const loading = ref<boolean>(false);
 const showPopIn = ref<boolean>(false);
+
+onMounted(()=>{
+  emit('creneau-mounted');
+})
 
 const scheduleJob = async () => {
   loading.value = true;

@@ -43,7 +43,7 @@
     <div v-if="error" style="color: red">{{ error }}</div>
     <div v-if="isJobsVisible">
       <h3>Liste des jobs à planifier:</h3>
-      <Jobs :jobs="jobsReceived"></Jobs>
+      <Jobs @jobs-mounted="jobsMounted" :jobs="jobsReceived"></Jobs>
     </div>
   </div>
 </template>
@@ -68,6 +68,8 @@ const getJobsListApiUrl = `/.netlify/functions/get-list-of-jobs-from-phone-and-p
 
 const fetchData = async () => {
   isJobsLoading.value = true;
+  isJobsVisible.value = false;
+
   error.value = null;
   try {
     if (postcode.value.length == 0) {
@@ -79,6 +81,7 @@ const fetchData = async () => {
       postCode: postcode.value,
     });
     const response = await fetch(`${getJobsListApiUrl}?${params}`);
+    
     if (!response.ok) {
       throw new Error(`Erreur : ${response.statusText}`);
     }
@@ -95,9 +98,12 @@ const fetchData = async () => {
   } finally {
     isJobsLoading.value = false;
   scrollToElementById("jobs");
-
   }
 };
+
+const jobsMounted = () => {
+  scrollToElementById("jobs");
+}
 
 function formatFrenchPhoneNumber(phoneNumber: string): string {
   // Supprimer tous les espaces, tirets, points et parenthèses
