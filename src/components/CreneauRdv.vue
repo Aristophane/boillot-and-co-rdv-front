@@ -1,10 +1,25 @@
 <template>
-  <div @click="scheduleJob()" class="creneauRdv">
+  <div @click="confirmJobScheduling" class="creneauRdv">
     <p>{{ formatDate(jobInfo.date) }}</p>
   </div>
 
   <div v-if="loading" class="overlay">
     <div class="spinner"></div>
+  </div>
+
+  <div v-if="showPopInConfirmation" class="popin-overlay">
+    <div class="popin-content">
+      <h2>Voulez vous fixer le rendez-vous à la date suivante :</h2>
+      <p>
+        <b>{{ formatDate(jobInfo.date) }}</b>
+      </p>
+      <div class="flexRow">
+        <button id="fermerButton" @click="closePopInConfirmation">
+          Non
+        </button>
+        <button @click="scheduleJob">Oui</button>
+      </div>
+    </div>
   </div>
 
   <div v-if="showPopIn" class="popin-overlay">
@@ -24,14 +39,19 @@ import { SchedulingJobInfo } from "../types/JobTypes";
 import { formatDate } from "../common/utils";
 
 const props = defineProps<{ jobInfo: SchedulingJobInfo }>();
-const emit = defineEmits(['creneau-mounted']);
+const emit = defineEmits(["creneau-mounted"]);
 const scheduleJobAPIUrl = `/.netlify/functions/schedule-job`;
 const loading = ref<boolean>(false);
 const showPopIn = ref<boolean>(false);
+const showPopInConfirmation = ref<boolean>(false);
 
-onMounted(()=>{
-  emit('creneau-mounted');
-})
+onMounted(() => {
+  emit("creneau-mounted");
+});
+
+const confirmJobScheduling = () => {
+  showPopInConfirmation.value = true;
+};
 
 const scheduleJob = async () => {
   loading.value = true;
@@ -66,12 +86,29 @@ const closePopIn = () => {
   showPopIn.value = false;
 };
 
+const closePopInConfirmation = () => {
+  showPopInConfirmation.value = false;
+};
+
 function remplacerEspaces(url: string): string {
   return url.replace(/\s/g, "%20");
 }
 </script>
 
 <style scoped>
+.flexRow {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#fermerButton{
+  margin-right: 2em;
+}
+
 @media (max-width: 812px) {
   .creneauRdv {
     font-size: 0.8em;
