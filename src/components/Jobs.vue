@@ -28,8 +28,9 @@
     </tbody>
   </table>
   <div>
-    <div v-if="isSchedulingVisible" class="flexRow">
+    <div v-if="isSchedulingVisible" class="flexColumn">
       <h3 id="creneauxId">Liste des créneaux disponibles</h3>
+      <p class="subText">Cliquez sur le créneau qui vous convient</p>
     </div>
     <ul v-if="isSchedulingVisible" class="creneauxJobs">
       <li v-for="item in possibleDates">
@@ -174,6 +175,13 @@ const isButtonDisabled = (job: Job) => {
 </script>
 
 <style scoped>
+.subText{
+  font-style: italic;
+  font-size: 0.8em;
+  margin: 0;
+}
+
+
 .flexRow {
   display: flex;
   flex-direction: row;

@@ -134,14 +134,15 @@ function remplacerEspaces(url: string): string {
 }
 
 .creneauRdv > p {
-  background-color: rgb(206, 206, 206);
+  background-color: rgb(188, 188, 188);
   text-align: center;
   align-content: center;
   padding: 1em;
 }
 
 .creneauRdv > p:hover {
-  background-color: rgb(192, 192, 192);
+  background-color: rgb(226, 226, 226);
+  cursor: pointer;
 }
 
 .overlay {

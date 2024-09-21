@@ -52,9 +52,32 @@ const getContactIdFromPhoneAndPostCode = async (phone, postCode) => {
   return data[0].ContactId;
 };
 
+function formatDate(date) {
+  let year = date.getFullYear();
+  let month = ("0" + (date.getMonth() + 1)).slice(-2); // Mois avec un 0 devant si besoin
+  let day = ("0" + date.getDate()).slice(-2); // Jour avec un 0 devant si besoin
+  return `${year}-${month}-${day}`;
+}
+
+const getStartAndEndDate = () => {
+  // Date actuelle
+  let currentDate = new Date();
+
+  let startDate = new Date();
+  startDate.setMonth(currentDate.getMonth() - 3);
+
+  let endDate = new Date();
+  endDate.setMonth(currentDate.getMonth() + 8);
+
+  let startString = formatDate(startDate);
+  let endString = formatDate(endDate);
+
+  return `Start=${startString}&End=${endString}`;
+};
+
 const getJobListFromContactId = async (clientId) => {
   //TODO remplacer les dates de début et de fin
-  const JOBSLIST_METHOD = "&action=JobsList&Start=2024-01-01&End=2024-12-12";
+  const JOBSLIST_METHOD = `&action=JobsList&${getStartAndEndDate()}`;
   const apiUrlForJobList = `${BIGCHANGE_BASE_API}${JOBSLIST_METHOD}&contactId=${clientId}`;
   const responseForJobs = await fetch(apiUrlForJobList, {
     method: "GET",
