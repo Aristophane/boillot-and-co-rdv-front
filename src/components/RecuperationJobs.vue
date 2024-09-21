@@ -97,7 +97,6 @@ const fetchData = async () => {
     error.value = (err as Error).message;
   } finally {
     isJobsLoading.value = false;
-  scrollToElementById("jobs");
   }
 };
 

@@ -74,3 +74,5 @@ export function scrollToElementById(elementId: string) {
 
     return newDate;
 }
+
+export const TELEPHONE_CONTACT_NUMBER = "06 06 06 06 06";

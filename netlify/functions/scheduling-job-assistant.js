@@ -11,7 +11,12 @@ export const handler = async (event, context) => {
   const jobId = params.jobId;
 
   const skillId = await getSkillIdFromName(skillType);
-  const scheduleJob = await scheduleAssistantJobs(skillId, latitude, longitude, jobId);
+  const scheduleJob = await scheduleAssistantJobs(
+    skillId,
+    latitude,
+    longitude,
+    jobId
+  );
 
   return {
     statusCode: 200,
@@ -20,21 +25,44 @@ export const handler = async (event, context) => {
 };
 
 const scheduleAssistantJobs = async (skillId, latitude, longitude, jobId) => {
-  const SCHEDULE_JOB_ASSISTANT_METHOD = "&action=JobSchedulingAssistant&schedulingType=1";
-  //On set un délai d'une semaine pour planifier le RDV
-  const startDate = getCurrentDateWithOffset(1);
-  const endDate = getCurrentDateWithOffset(8);
-  const apiUrlForSchedulingAssistant = `${BIGCHANGE_BASE_API}${SCHEDULE_JOB_ASSISTANT_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}&skills=${skillId}`;
+  const SCHEDULE_JOB_ASSISTANT_METHOD =
+    "&action=JobSchedulingAssistant&schedulingType=1";
+  let creneauxDispos = false;
+  let dayShift = 0;
+  let rdvForJob = null;
+  while (!creneauxDispos) {
+    //On set un délai d'une semaine pour planifier le RDV
+    const startDate = getCurrentDateWithOffset(dayShift+1);
+    const endDate = getCurrentDateWithOffset(dayShift+8);
+    const apiUrlForSchedulingAssistant = `${BIGCHANGE_BASE_API}${SCHEDULE_JOB_ASSISTANT_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}&skills=${skillId}`;
 
-  const rdvForJob = await fetch(apiUrlForSchedulingAssistant, {
-    method: "GET",
-    headers: {
-      Authorization: authInfo,
-    },
-  }).then((response) => response.json());
-  console.log(
-    "FUNCTION SCHEDULE ASSISTANT //////// response:" + JSON.stringify(rdvForJob)
-  );
+   rdvForJob = await fetch(apiUrlForSchedulingAssistant, {
+      method: "GET",
+      headers: {
+        Authorization: authInfo,
+      },
+    }).then((response) => response.json());
+
+    if (
+      rdvForJob.Result &&
+      Array.isArray(rdvForJob.Result) &&
+      rdvForJob.Result.length > 0
+    ) {
+      console.log(
+        "FUNCTION SCHEDULE ASSISTANT //////// response:" +
+          JSON.stringify(rdvForJob)
+      );
+      creneauxDispos = true;
+    }
+    else if(dayShift < 30 ){
+      console.log("numberOfDays" + dayShift)
+      dayShift +=8;
+    }
+    else{
+      //Dans le cas où il n'y pas de créneaux dans les 30 jours on sors du traitement
+      creneauxDispos = true;
+    }
+  }
   return rdvForJob;
 };
 

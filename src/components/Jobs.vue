@@ -1,4 +1,5 @@
 <template>
+  <div v-if="error" style="color: red">{{ error }}</div>
   <table id="jobs" class="jobsTable">
     <thead>
       <tr>
@@ -15,7 +16,8 @@
         </td>
         <td>{{ job.Location }}</td>
         <td>
-          {{ transformStatus(job.Status) }} <br />{{
+          {{ job.Status != "Scheduled" ? transformStatus(job.Status) : "" }}
+          <br />{{
             job.PlannedStart !== null ? formatDate(job.PlannedStart) : ""
           }}
         </td>
@@ -29,12 +31,16 @@
   </table>
   <div>
     <div v-if="isSchedulingVisible" class="flexColumn">
-      <h3 id="creneauxId">Liste des créneaux disponibles</h3>
-      <p class="subText">Cliquez sur le créneau qui vous convient</p>
+      <h3 v-if="isSchedulingVisible" id="creneauxId">Liste des créneaux disponibles</h3>
+      <p v-if="isSchedulingVisible" class="subText">Cliquez sur le créneau qui vous convient</p>
     </div>
     <ul v-if="isSchedulingVisible" class="creneauxJobs">
       <li v-for="item in possibleDates">
-        <CreneauRdv @job-scheduled="emit('relay-job-scheduled')" @creneau-mounted="focusCreneaux" :jobInfo="item"></CreneauRdv>
+        <CreneauRdv
+          @job-scheduled="emit('relay-job-scheduled')"
+          @creneau-mounted="focusCreneaux"
+          :jobInfo="item"
+        ></CreneauRdv>
       </li>
     </ul>
   </div>
@@ -45,13 +51,17 @@ import { ref, onMounted } from "vue";
 import { Job, SchedulingJobInfo } from "../types/JobTypes";
 import { ScheduleJobResult } from "../types/JobTypes";
 import CreneauRdv from "./CreneauRdv.vue";
-import { scrollToElementById, formatDate } from "../common/utils";
+import {
+  scrollToElementById,
+  formatDate,
+  TELEPHONE_CONTACT_NUMBER,
+} from "../common/utils";
+const error = ref<string | null>(null);
+const emit = defineEmits(["jobs-mounted", "relay-job-scheduled"]);
 
-const emit = defineEmits(['jobs-mounted', 'relay-job-scheduled']);
-
-onMounted(()=>{
-  emit('jobs-mounted');
-})
+onMounted(() => {
+  emit("jobs-mounted");
+});
 
 const props = defineProps<{ jobs: Job[] }>();
 const scheduleJobAPIUrl = `/.netlify/functions/scheduling-job-assistant`;
@@ -63,11 +73,12 @@ const resetJobStatus = (jobs: Job[]) => {
   jobs.forEach((job) => (job.IsJobSelected = false));
 };
 
-const focusCreneaux = ()=>{
+const focusCreneaux = () => {
   scrollToElementById("creneauxId");
-}
+};
 
 const planifierJob = async (job: Job) => {
+  error.value = null;
   resetJobStatus(props.jobs);
   job.IsLoadingPlanification = true;
   job.IsJobSelected = true;
@@ -87,6 +98,16 @@ const planifierJob = async (job: Job) => {
     }
 
     const result = await response.json();
+    if (
+      !result.scheduleJob.Result ||
+      !Array.isArray(result.scheduleJob.Result) ||
+      result.scheduleJob.Result.length == 0
+    ) {
+      throw new Error(
+        `Nous n'avons pas de créneaux disponibles pour cette intervention merci de nous contacter au ${TELEPHONE_CONTACT_NUMBER}`
+      );
+    }
+
     isSchedulingVisible.value = true;
     const jobDurationInMinutes = convertirEnMinutes(job.Duration);
     result.scheduleJob.Result.forEach((element: ScheduleJobResult) => {
@@ -105,9 +126,9 @@ const planifierJob = async (job: Job) => {
     );
   } catch (err) {
     console.log(err);
+    error.value = (err as Error).message;
   } finally {
     job.IsLoadingPlanification = false;
-    scrollToElementById("creneauxId");
   }
 };
 
@@ -174,12 +195,11 @@ const isButtonDisabled = (job: Job) => {
 </script>
 
 <style scoped>
-.subText{
+.subText {
   font-style: italic;
   font-size: 0.8em;
   margin: 0;
 }
-
 
 .flexRow {
   display: flex;

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import RecuperationJobs from "./components/RecuperationJobs.vue";
 import logo from "./assets/logoBoillot.jpg"; // Importer l'image
+import { TELEPHONE_CONTACT_NUMBER } from "./common/utils";
+
 </script>
 
 <template>
@@ -9,8 +11,7 @@ import logo from "./assets/logoBoillot.jpg"; // Importer l'image
   </header>
   <RecuperationJobs />
   <footer>
-    En cas de problème pour fixer le rendez-vous contactez nous au 06 06 06 06
-    06
+    En cas de problème pour fixer le rendez-vous contactez nous au {{ TELEPHONE_CONTACT_NUMBER }}
   </footer>
 </template>
 
