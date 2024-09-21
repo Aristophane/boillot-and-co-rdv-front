@@ -34,21 +34,20 @@
     </div>
     <ul v-if="isSchedulingVisible" class="creneauxJobs">
       <li v-for="item in possibleDates">
-        <CreneauRdv @creneau-mounted="focusCreneaux" :jobInfo="item"></CreneauRdv>
+        <CreneauRdv @job-scheduled="emit('relay-job-scheduled')" @creneau-mounted="focusCreneaux" :jobInfo="item"></CreneauRdv>
       </li>
     </ul>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { onMounted } from 'vue'; 
+import { ref, onMounted } from "vue";
 import { Job, SchedulingJobInfo } from "../types/JobTypes";
 import { ScheduleJobResult } from "../types/JobTypes";
 import CreneauRdv from "./CreneauRdv.vue";
 import { scrollToElementById, formatDate } from "../common/utils";
 
-const emit = defineEmits(['jobs-mounted']);
+const emit = defineEmits(['jobs-mounted', 'relay-job-scheduled']);
 
 onMounted(()=>{
   emit('jobs-mounted');

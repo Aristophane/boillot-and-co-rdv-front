@@ -14,9 +14,7 @@
         <b>{{ formatDate(jobInfo.date) }}</b>
       </p>
       <div class="flexRow">
-        <button id="fermerButton" @click="closePopInConfirmation">
-          Non
-        </button>
+        <button id="fermerButton" @click="closePopInConfirmation">Non</button>
         <button @click="scheduleJob">Oui</button>
       </div>
     </div>
@@ -39,7 +37,7 @@ import { SchedulingJobInfo } from "../types/JobTypes";
 import { formatDate } from "../common/utils";
 
 const props = defineProps<{ jobInfo: SchedulingJobInfo }>();
-const emit = defineEmits(["creneau-mounted"]);
+const emit = defineEmits(["creneau-mounted", "job-scheduled"]);
 const scheduleJobAPIUrl = `/.netlify/functions/schedule-job`;
 const loading = ref<boolean>(false);
 const showPopIn = ref<boolean>(false);
@@ -54,6 +52,7 @@ const confirmJobScheduling = () => {
 };
 
 const scheduleJob = async () => {
+  showPopInConfirmation.value = false;
   loading.value = true;
   var formatedDate = remplacerEspaces(props.jobInfo.date);
   const params = new URLSearchParams({
@@ -70,11 +69,11 @@ const scheduleJob = async () => {
     if (!response.ok) {
       throw new Error(`Erreur : ${response.statusText}`);
     }
-
     const result = await response.json();
     console.log(
       "FRONT  schedule Received        ------" + JSON.stringify(result)
     );
+    emit("job-scheduled");
   } catch (err) {
     console.log(err);
   } finally {
@@ -105,7 +104,7 @@ function remplacerEspaces(url: string): string {
   flex-wrap: wrap;
 }
 
-#fermerButton{
+#fermerButton {
   margin-right: 2em;
 }
 

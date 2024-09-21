@@ -43,7 +43,7 @@
     <div v-if="error" style="color: red">{{ error }}</div>
     <div v-if="isJobsVisible">
       <h3>Liste des jobs à planifier:</h3>
-      <Jobs @jobs-mounted="jobsMounted" :jobs="jobsReceived"></Jobs>
+      <Jobs @relay-job-scheduled="fetchData" @jobs-mounted="jobsMounted" :jobs="jobsReceived"></Jobs>
     </div>
   </div>
 </template>
