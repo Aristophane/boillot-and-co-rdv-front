@@ -26,19 +26,27 @@ export const handler = async (event, context) => {
   };
 };
 
-const scheduleAssistantJobs = async (skillId, latitude, longitude, jobId, slidingDate) => {
+const scheduleAssistantJobs = async (
+  skillId,
+  latitude,
+  longitude,
+  jobId,
+  slidingDate
+) => {
   const SCHEDULE_JOB_ASSISTANT_METHOD =
     "&action=JobSchedulingAssistant&schedulingType=1";
   let creneauxDispos = false;
-  let dayShift = parseInt(slidingDate,10);
+  let dayShift = parseInt(slidingDate, 10);
   let rdvForJob = null;
   while (!creneauxDispos) {
     //On set un délai d'une semaine pour planifier le RDV
-    const startDate = getCurrentDateWithOffset(dayShift+1);
-    const endDate = getCurrentDateWithOffset(dayShift+8);
+    const startDate = getCurrentDateWithOffset(dayShift + 1);
+    const endDate = getCurrentDateWithOffset(dayShift + 8);
     const apiUrlForSchedulingAssistant = `${BIGCHANGE_BASE_API}${SCHEDULE_JOB_ASSISTANT_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}&skills=${skillId}`;
-    console.log("THE URL FOR API SCHEDULING IS " + apiUrlForSchedulingAssistant);
-   rdvForJob = await fetch(apiUrlForSchedulingAssistant, {
+    console.log(
+      "THE URL FOR API SCHEDULING IS " + apiUrlForSchedulingAssistant
+    );
+    rdvForJob = await fetch(apiUrlForSchedulingAssistant, {
       method: "GET",
       headers: {
         Authorization: authInfo,
@@ -55,12 +63,10 @@ const scheduleAssistantJobs = async (skillId, latitude, longitude, jobId, slidin
           JSON.stringify(rdvForJob)
       );
       creneauxDispos = true;
-    }
-    else if(dayShift < 30 ){
-      console.log("numberOfDays" + dayShift)
-      dayShift +=8;
-    }
-    else{
+    } else if (dayShift < 30) {
+      console.log("numberOfDays" + dayShift);
+      dayShift += 8;
+    } else {
       //Dans le cas où il n'y pas de créneaux dans les 30 jours on sors du traitement
       creneauxDispos = true;
     }
