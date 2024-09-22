@@ -9,13 +9,15 @@ export const handler = async (event, context) => {
   const latitude = params.latitude;
   const longitude = params.longitude;
   const jobId = params.jobId;
+  const slidingDate = params.slidingDate;
 
   const skillId = await getSkillIdFromName(skillType);
   const scheduleJob = await scheduleAssistantJobs(
     skillId,
     latitude,
     longitude,
-    jobId
+    jobId,
+    slidingDate
   );
 
   return {
@@ -24,18 +26,18 @@ export const handler = async (event, context) => {
   };
 };
 
-const scheduleAssistantJobs = async (skillId, latitude, longitude, jobId) => {
+const scheduleAssistantJobs = async (skillId, latitude, longitude, jobId, slidingDate) => {
   const SCHEDULE_JOB_ASSISTANT_METHOD =
     "&action=JobSchedulingAssistant&schedulingType=1";
   let creneauxDispos = false;
-  let dayShift = 0;
+  let dayShift = parseInt(slidingDate,10);
   let rdvForJob = null;
   while (!creneauxDispos) {
     //On set un délai d'une semaine pour planifier le RDV
     const startDate = getCurrentDateWithOffset(dayShift+1);
     const endDate = getCurrentDateWithOffset(dayShift+8);
     const apiUrlForSchedulingAssistant = `${BIGCHANGE_BASE_API}${SCHEDULE_JOB_ASSISTANT_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}&skills=${skillId}`;
-
+    console.log("THE URL FOR API SCHEDULING IS " + apiUrlForSchedulingAssistant);
    rdvForJob = await fetch(apiUrlForSchedulingAssistant, {
       method: "GET",
       headers: {
@@ -94,8 +96,12 @@ const getSkillIdFromName = async (skillName) => {
 
 function getCurrentDateWithOffset(offsetDays) {
   const today = new Date();
-  today.setDate(today.getDate() + offsetDays);
+  console.log("THE OFFSET IS " + offsetDays);
 
+  const parsedOffset = parseInt(offsetDays, 10);
+  console.log("THE PARSED OFFSET IS " + parsedOffset);
+  today.setDate(today.getDate() + parseInt(offsetDays, 10));
+  console.log("THE ADDED OFFSET IS " + parsedOffset);
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");

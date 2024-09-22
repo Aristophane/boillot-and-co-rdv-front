@@ -22,7 +22,7 @@
           }}
         </td>
         <td>
-          <button @click="planifierJob(job)" :disabled="isButtonDisabled(job)">
+          <button @click="initialPlanification(job)" :disabled="isButtonDisabled(job)">
             {{ getButtonLibelle(job) }}
           </button>
         </td>
@@ -31,8 +31,16 @@
   </table>
   <div>
     <div v-if="isSchedulingVisible" class="flexColumn">
-      <h3 v-if="isSchedulingVisible" id="creneauxId">Liste des créneaux disponibles</h3>
-      <p v-if="isSchedulingVisible" class="subText">Cliquez sur le créneau qui vous convient</p>
+      <h3 v-if="isSchedulingVisible" id="creneauxId">
+        Liste des créneaux disponibles
+      </h3>
+      <div id="nextAndPreviousButtons" class="flexRow">
+        <button @click="fetchPreviousCreneaux" :disabled="slidingDate == 0">Créneaux Précédents</button>
+        <button @click="fetchNextCreneaux">Créneaux Suivant</button>
+      </div>
+      <p v-if="isSchedulingVisible" class="subText">
+        Cliquez sur le créneau qui vous convient
+      </p>
     </div>
     <ul v-if="isSchedulingVisible" class="creneauxJobs">
       <li v-for="item in possibleDates">
@@ -63,11 +71,31 @@ onMounted(() => {
   emit("jobs-mounted");
 });
 
+let currentJob: Job | undefined;
 const props = defineProps<{ jobs: Job[] }>();
 const scheduleJobAPIUrl = `/.netlify/functions/scheduling-job-assistant`;
 
 const isSchedulingVisible = ref<boolean>(false);
 const possibleDates = ref<SchedulingJobInfo[]>([]);
+let slidingDate = ref<number>(0);
+
+const fetchNextCreneaux = () => {
+  if(currentJob !== undefined){
+    console.log("SLIDING DATE BEFORE: " + slidingDate.value);
+    slidingDate.value += 7;
+    console.log("SLIDING DATE AFTER: " + slidingDate.value);
+    planifierJob(currentJob, slidingDate.value);
+  }
+};
+
+const fetchPreviousCreneaux = () => {
+  if(currentJob !== undefined){
+    console.log("SLIDING DATE BEFORE: " + slidingDate.value);
+    slidingDate.value -= 7;
+    console.log("SLIDING DATE AFTER: " + slidingDate.value);
+    planifierJob(currentJob, slidingDate.value);
+  }
+};
 
 const resetJobStatus = (jobs: Job[]) => {
   jobs.forEach((job) => (job.IsJobSelected = false));
@@ -77,7 +105,11 @@ const focusCreneaux = () => {
   scrollToElementById("creneauxId");
 };
 
-const planifierJob = async (job: Job) => {
+const initialPlanification = async (job: Job) => {
+  return await planifierJob(job, 0);
+}
+
+const planifierJob = async (job: Job, slidingDate: number) => {
   error.value = null;
   resetJobStatus(props.jobs);
   job.IsLoadingPlanification = true;
@@ -88,6 +120,7 @@ const planifierJob = async (job: Job) => {
     latitude: job.JobContactLatitude,
     longitude: job.JobContactLongitude,
     jobId: job.JobId.toString(),
+    slidingDate: slidingDate.toString()
   });
 
   try {
@@ -129,6 +162,7 @@ const planifierJob = async (job: Job) => {
     error.value = (err as Error).message;
   } finally {
     job.IsLoadingPlanification = false;
+    currentJob = job;
   }
 };
 
@@ -195,6 +229,14 @@ const isButtonDisabled = (job: Job) => {
 </script>
 
 <style scoped>
+#nextAndPreviousButtons {
+  gap: 0.5em;
+}
+
+.flexRow > button {
+  font-size: 0.8em;
+}
+
 .subText {
   font-style: italic;
   font-size: 0.8em;
