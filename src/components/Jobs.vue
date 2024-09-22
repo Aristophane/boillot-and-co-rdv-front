@@ -106,6 +106,7 @@ const focusCreneaux = () => {
 };
 
 const initialPlanification = async (job: Job) => {
+  slidingDate.value = 0;
   return await planifierJob(job, 0);
 }
 
