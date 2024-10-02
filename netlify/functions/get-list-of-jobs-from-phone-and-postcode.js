@@ -8,17 +8,37 @@ export const handler = async (event, context) => {
   const phoneNumber = params.phone;
   const postCode = params.postCode;
   const formattedPhoneNumber = replacePlusWithEncodedPlus(phoneNumber);
-  const clientId = await getContactIdFromPhoneAndPostCode(
-    formattedPhoneNumber,
-    postCode
-  );
+  try {
+    const clientId = await getContactIdFromPhoneAndPostCode(
+      formattedPhoneNumber,
+      postCode
+    );
 
-  const responseForJobs = await getJobListFromContactId(clientId);
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ responseForJobs, clientId }),
-  };
+    if (clientId == null || clientId == undefined) {
+      const responseForJobs = await getJobListFromContactId(clientId);
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ responseForJobs, clientId }),
+      };
+    }
+    else{
+      return {
+        statusCode: 404,
+        body: JSON.stringify({
+          message: "Pas de client relié ou client en double",
+          error: clientId?.message || "Erreur inconnue",
+        }),
+      };
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Une erreur est survenue",
+        error: error?.message || "Erreur inconnue",
+      }),
+    };
+  }
 };
 
 function replacePlusWithEncodedPlus(inputString) {
@@ -30,26 +50,41 @@ const getContactIdFromPhoneAndPostCode = async (phone, postCode) => {
 
   const apiUrlForContactsByPhone = `${BIGCHANGE_BASE_API}${CONTACTS_BY_PHONE_METHOD}&phonenumber=${phone}`;
 
-  const responseForContact = await fetch(apiUrlForContactsByPhone, {
-    method: "GET",
-    headers: {
-      Authorization: authInfo,
-    },
-  }).then((response) => response.json());
+  try {
+    const responseForContact = await fetch(apiUrlForContactsByPhone, {
+      method: "GET",
+      headers: {
+        Authorization: authInfo,
+      },
+    }).then((response) => response.json());
 
-  console.log("API called" + apiUrlForContactsByPhone);
-  console.log(
-    "FUNCTION //////// response:" + JSON.stringify(responseForContact)
-  );
-  const data = responseForContact?.Result.filter(
-    (contact) => contact.ContactPostCode === postCode
-  );
+    console.log("API called" + apiUrlForContactsByPhone);
+    console.log(
+      "FUNCTION //////// response:" + JSON.stringify(responseForContact)
+    );
+    const data = responseForContact?.Result.filter(
+      (contact) => contact.ContactPostCode === postCode
+    );
 
-  console.log("FUNCTION //////// postCode: " + postCode);
+    if (data !== null && data !== undefined && data.length === 1) {
+      return data[0].ContactId;
+    }
 
-  //TODO ajouter la gestion du fait qu'avoir plusieurs résultats doit stopper le processus
-
-  return data[0].ContactId;
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: data.length > 1 ? "Contact en double" : "Contact inconnu"
+      }),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Une erreur est survenue",
+        error: error?.message || "Erreur inconnue",
+      }),
+    };
+  }
 };
 
 function formatDate(date) {
@@ -76,7 +111,6 @@ const getStartAndEndDate = () => {
 };
 
 const getJobListFromContactId = async (clientId) => {
-  //TODO remplacer les dates de début et de fin
   const JOBSLIST_METHOD = `&action=JobsList&${getStartAndEndDate()}`;
   const apiUrlForJobList = `${BIGCHANGE_BASE_API}${JOBSLIST_METHOD}&contactId=${clientId}`;
   const responseForJobs = await fetch(apiUrlForJobList, {
@@ -86,5 +120,18 @@ const getJobListFromContactId = async (clientId) => {
     },
   }).then((responseForJobs) => responseForJobs.json());
 
+  const resultJson = JSON.stringify(responseForJobs);
+  if (
+    resultJson != null ||
+    resultJson != undefined ||
+    resultJson.Result?.length == 0
+  ) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({
+        message: `Pas de jobs pour le numéro de client ${clientId}`,
+      }),
+    };
+  }
   return responseForJobs;
 };

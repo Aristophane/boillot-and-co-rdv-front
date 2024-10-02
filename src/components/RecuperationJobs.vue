@@ -36,14 +36,18 @@
         <br />
       </div>
     </div>
-    <button @click="fetchData" :disabled="isJobsLoading">
+    <button class="buttonValider" @click="fetchData" :disabled="isJobsLoading">
       {{ isJobsLoading ? "Chargement..." : "Valider" }}
     </button>
     <div v-if="isJobsLoading" class="loader">Chargement des interventions</div>
     <div v-if="error" style="color: red">{{ error }}</div>
     <div v-if="isJobsVisible">
       <h3>Liste des jobs à planifier:</h3>
-      <Jobs @relay-job-scheduled="fetchData" @jobs-mounted="jobsMounted" :jobs="jobsReceived"></Jobs>
+      <Jobs
+        @relay-job-scheduled="fetchData"
+        @jobs-mounted="jobsMounted"
+        :jobs="jobsReceived"
+      ></Jobs>
     </div>
   </div>
 </template>
@@ -81,11 +85,11 @@ const fetchData = async () => {
       postCode: postcode.value,
     });
     const response = await fetch(`${getJobsListApiUrl}?${params}`);
-    
+
     if (!response.ok) {
       throw new Error(`Erreur : ${response.statusText}`);
     }
- 
+
     data.value = await response.json();
     isJobsVisible.value = true;
     const result = data.value;
@@ -93,7 +97,6 @@ const fetchData = async () => {
       jobsReceived.value = result.responseForJobs.Result;
     } else error.value = null;
   } catch (err) {
-
     error.value = (err as Error).message;
   } finally {
     isJobsLoading.value = false;
@@ -102,7 +105,7 @@ const fetchData = async () => {
 
 const jobsMounted = () => {
   scrollToElementById("jobs");
-}
+};
 
 function formatFrenchPhoneNumber(phoneNumber: string): string {
   // Supprimer tous les espaces, tirets, points et parenthèses
@@ -205,6 +208,14 @@ p {
   input {
     width: 100%;
   }
+}
+
+.buttonValider {
+  transition: transform 0.2s ease-in-out;
+}
+
+.buttonValider:hover {
+  transform: scale(1.1);
 }
 
 .jobsRecuperationContainer {

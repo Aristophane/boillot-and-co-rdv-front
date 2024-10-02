@@ -63,7 +63,7 @@ const scheduleAssistantJobs = async (
           JSON.stringify(rdvForJob)
       );
       creneauxDispos = true;
-    } else if (dayShift < 30) {
+    } else if (dayShift < 90) {
       console.log("numberOfDays" + dayShift);
       dayShift += 8;
     } else {

@@ -55,7 +55,7 @@ export function scrollToElementById(elementId: string) {
     const hoursPusOneFormatted = hoursPlusOne.toString().padStart(2, "0"); // Format avec deux chiffres
     const minutes = roundedDate.getMinutes().toString().padStart(2, "0");
 
-    return `Arrivée de notre technicien le ${dayName} ${day} ${month} ${year} entre  ${hoursMinusOneFormatted}h${minutes} et ${hoursPusOneFormatted}h${minutes}`
+    return `${dayName} ${day} ${month} ${year} entre  ${hoursMinusOneFormatted}h${minutes} et ${hoursPusOneFormatted}h${minutes}`
   
     // Retourner la date formatée
     return `${dayName} ${day} ${month} ${year} à ${hours}h${minutes}`;
