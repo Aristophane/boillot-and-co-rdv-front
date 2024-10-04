@@ -22,7 +22,11 @@
           }}
         </td>
         <td>
-          <button @click="initialPlanification(job)" :disabled="isButtonDisabled(job)">
+          <button
+            :class="getRowClassForButton(job)"
+            @click="initialPlanification(job)"
+            :disabled="isButtonDisabled(job)"
+          >
             {{ getButtonLibelle(job) }}
           </button>
         </td>
@@ -35,7 +39,9 @@
         Liste des créneaux disponibles
       </h3>
       <div id="nextAndPreviousButtons" class="flexRow">
-        <button @click="fetchPreviousCreneaux" :disabled="slidingDate == 0">Créneaux Précédents</button>
+        <button @click="fetchPreviousCreneaux" :disabled="slidingDate == 0">
+          Créneaux Précédents
+        </button>
         <button @click="fetchNextCreneaux">Créneaux Suivant</button>
       </div>
       <p v-if="isSchedulingVisible" class="subText">
@@ -72,7 +78,7 @@ onMounted(() => {
 });
 
 let currentJob: Job | undefined;
-const props = defineProps<{ jobs: Job[] }>();
+const props = defineProps<{ jobs: Job[]}>();
 const scheduleJobAPIUrl = `/.netlify/functions/scheduling-job-assistant`;
 
 const isSchedulingVisible = ref<boolean>(false);
@@ -80,7 +86,7 @@ const possibleDates = ref<SchedulingJobInfo[]>([]);
 let slidingDate = ref<number>(0);
 
 const fetchNextCreneaux = () => {
-  if(currentJob !== undefined){
+  if (currentJob !== undefined) {
     console.log("SLIDING DATE BEFORE: " + slidingDate.value);
     slidingDate.value += 7;
     console.log("SLIDING DATE AFTER: " + slidingDate.value);
@@ -89,7 +95,7 @@ const fetchNextCreneaux = () => {
 };
 
 const fetchPreviousCreneaux = () => {
-  if(currentJob !== undefined){
+  if (currentJob !== undefined) {
     console.log("SLIDING DATE BEFORE: " + slidingDate.value);
     slidingDate.value -= 7;
     console.log("SLIDING DATE AFTER: " + slidingDate.value);
@@ -108,7 +114,7 @@ const focusCreneaux = () => {
 const initialPlanification = async (job: Job) => {
   slidingDate.value = 0;
   return await planifierJob(job, 0);
-}
+};
 
 const planifierJob = async (job: Job, slidingDate: number) => {
   error.value = null;
@@ -121,7 +127,7 @@ const planifierJob = async (job: Job, slidingDate: number) => {
     latitude: job.JobContactLatitude,
     longitude: job.JobContactLongitude,
     jobId: job.JobId.toString(),
-    slidingDate: slidingDate.toString()
+    slidingDate: slidingDate.toString(),
   });
 
   try {
@@ -171,7 +177,12 @@ const getRowClass = (job: Job): string => {
   return job.IsJobSelected ? "selected-job" : "";
 };
 
+const getRowClassForButton = (job: Job): string => {
+  return job.IsJobSelected ? "selected-job-button" : "";
+};
+
 const formatTime = (time: string): string => {
+  console.log("QUEL EST LE TIME : " + time);
   const [hours, minutes] = time.split(":").map(Number);
   if (hours === 0) {
     return `${minutes} min`;
@@ -304,6 +315,14 @@ li {
 
 .selected-job {
   background-color: rgb(216, 216, 216);
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.selected-job-button {
+  background-color: rgb(0, 183, 255);
 }
 
 .jobsTable {

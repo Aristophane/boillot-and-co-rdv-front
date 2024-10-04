@@ -28,7 +28,7 @@ export interface Job {
 export interface ResponseDataForJobs {
   responseForJobs: {
     Code: number;
-    Result: Job[];
+    Result: Job[] | string;
   };
   clientId: number;
 }

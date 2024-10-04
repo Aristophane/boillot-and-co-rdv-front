@@ -10,7 +10,7 @@
     </h3>
     <div className="flexColumn">
       <div class="flexRow">
-        <label for="phone">Numéro de téléphone: </label>
+        <label class="phoneClass" for="phone">Numéro de téléphone: </label>
         <input
           class="clientInput"
           type="tel"
@@ -23,7 +23,7 @@
         />
       </div>
       <div id="postCode" class="flexRow">
-        <label for="postcode">Code postal: </label>
+        <label class="postCodeClass" for="postcode">Code postal: </label>
         <input
           class="clientInput"
           type="text"
@@ -73,8 +73,8 @@ const getJobsListApiUrl = `/.netlify/functions/get-list-of-jobs-from-phone-and-p
 const fetchData = async () => {
   isJobsLoading.value = true;
   isJobsVisible.value = false;
-
   error.value = null;
+
   try {
     if (postcode.value.length == 0) {
       throw new Error(`Merci d'indiquer le code postal de l'habitation`);
@@ -87,15 +87,21 @@ const fetchData = async () => {
     const response = await fetch(`${getJobsListApiUrl}?${params}`);
 
     if (!response.ok) {
-      throw new Error(`Erreur : ${response.statusText}`);
+      throw new Error(`Nous n'avons pas pu identifier votre compte client, merci de nous contacter par téléphone`);
     }
 
     data.value = await response.json();
-    isJobsVisible.value = true;
     const result = data.value;
     if (result !== undefined) {
-      jobsReceived.value = result.responseForJobs.Result;
-    } else error.value = null;
+      if (result.responseForJobs?.Result == "No results") {
+        error.value = "Pas de travaux à planifier";
+      } else {
+        isJobsVisible.value = true;
+        jobsReceived.value = result.responseForJobs.Result as Job[];
+      }
+    } else {
+      error.value = "Erreur lors de la récupération des Jobs";
+    }
   } catch (err) {
     error.value = (err as Error).message;
   } finally {
@@ -145,6 +151,11 @@ function formatFrenchPhoneNumber(phoneNumber: string): string {
 </script>
 
 <style scoped>
+.phoneClass,
+.postCodeClass {
+  margin-right: 1em;
+}
+
 body {
   font-family: "Swiss", sans-serif;
   background-color: #f0f0f0;
@@ -186,8 +197,6 @@ p {
   width: 100%;
   align-items: center;
   justify-content: center;
-  gap: 2em;
-  flex-wrap: wrap;
 }
 
 .loader {
@@ -227,8 +236,23 @@ p {
 }
 
 input[type="text"] {
-  text-align: center; /* Centre le texte horizontalement */
+  width: 30%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  text-align: center;
+  border-radius: 25px;
+  background-color: #f9f9f9;
   font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus {
+  border-color: #125ed6; /* Couleur lors du focus */
+  box-shadow: 0 0 10px rgba(108, 99, 255, 0.4);
+  background-color: #fff;
 }
 
 /* Style du placeholder */
@@ -237,8 +261,24 @@ input[type="text"]::placeholder {
 }
 
 input[type="tel"] {
-  text-align: center; /* Centre le texte horizontalement */
+  width: 30%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  text-align: center;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 25px;
+  background-color: #f9f9f9;
   font-size: 16px;
+  min-width: 153px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="tel"]:focus {
+  border-color: #125ed6; /* Couleur lors du focus */
+  box-shadow: 0 0 10px rgba(108, 99, 255, 0.4);
+  background-color: #fff;
 }
 
 /* Style du placeholder */

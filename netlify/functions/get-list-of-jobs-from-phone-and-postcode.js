@@ -14,14 +14,16 @@ export const handler = async (event, context) => {
       postCode
     );
 
-    if (clientId == null || clientId == undefined) {
+    console.log("THE CLIENT ID IS: " + clientId);
+
+    if (clientId != null && clientId != undefined && typeof clientId === "number" && !isNaN(clientId)
+    ) {
       const responseForJobs = await getJobListFromContactId(clientId);
       return {
         statusCode: 200,
         body: JSON.stringify({ responseForJobs, clientId }),
       };
-    }
-    else{
+    } else {
       return {
         statusCode: 404,
         body: JSON.stringify({
@@ -73,7 +75,7 @@ const getContactIdFromPhoneAndPostCode = async (phone, postCode) => {
     return {
       statusCode: 500,
       body: JSON.stringify({
-        message: data.length > 1 ? "Contact en double" : "Contact inconnu"
+        message: data.length > 1 ? "Contact en double" : "Contact inconnu",
       }),
     };
   } catch (error) {
@@ -122,8 +124,8 @@ const getJobListFromContactId = async (clientId) => {
 
   const resultJson = JSON.stringify(responseForJobs);
   if (
-    resultJson != null ||
-    resultJson != undefined ||
+    resultJson == null ||
+    resultJson == undefined ||
     resultJson.Result?.length == 0
   ) {
     return {
@@ -132,6 +134,7 @@ const getJobListFromContactId = async (clientId) => {
         message: `Pas de jobs pour le numéro de client ${clientId}`,
       }),
     };
+  } else {
+    return responseForJobs;
   }
-  return responseForJobs;
 };
