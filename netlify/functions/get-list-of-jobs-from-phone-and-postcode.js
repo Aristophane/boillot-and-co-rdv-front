@@ -60,7 +60,7 @@ const getContactIdFromPhoneAndPostCode = async (phone, postCode) => {
       },
     }).then((response) => response.json());
 
-    console.log("API called" + apiUrlForContactsByPhone);
+    console.log("API called: " + apiUrlForContactsByPhone);
     console.log(
       "FUNCTION //////// response:" + JSON.stringify(responseForContact)
     );
