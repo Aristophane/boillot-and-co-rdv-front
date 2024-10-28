@@ -87,11 +87,13 @@ const getSkills = async () => {
 
 const getSkillIdFromName = async (skillName) => {
   const skills = await getSkills();
+  console.log("Skill demandé (skillName): " + skillName);
+  console.log("Skills récupérés: " + JSON.stringify(skills));
   if (skills !== null) {
     const skill = skills.Result.filter(
       (attribute) => attribute.AttributeName === skillName
     );
-    if (skill !== null) {
+    if (skill !== null || skill === undefined) {
       return skill[0].AttributeId;
     }
   }
