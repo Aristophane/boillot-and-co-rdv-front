@@ -42,7 +42,10 @@ const scheduleAssistantJobs = async (
     //On set un délai d'une semaine pour planifier le RDV
     const startDate = getCurrentDateWithOffset(dayShift + 1);
     const endDate = getCurrentDateWithOffset(dayShift + 8);
-    const apiUrlForSchedulingAssistant = `${BIGCHANGE_BASE_API}${SCHEDULE_JOB_ASSISTANT_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}&skills=${skillId}`;
+    //TODO ATTENTION version sans skillId
+    // const apiUrlForSchedulingAssistant = `${BIGCHANGE_BASE_API}${SCHEDULE_JOB_ASSISTANT_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}&skills=${skillId}`;
+    const apiUrlForSchedulingAssistant = `${BIGCHANGE_BASE_API}${SCHEDULE_JOB_ASSISTANT_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}`;
+    
     console.log(
       "THE URL FOR API SCHEDULING IS " + apiUrlForSchedulingAssistant
     );
@@ -86,17 +89,17 @@ const getSkills = async () => {
 };
 
 const getSkillIdFromName = async (skillName) => {
-  const skills = await getSkills();
-  console.log("Skill demandé (skillName): " + skillName);
-  console.log("Skills récupérés: " + JSON.stringify(skills));
-  if (skills !== null) {
-    const skill = skills.Result.filter(
-      (attribute) => attribute.AttributeName === skillName
-    );
-    if (skill !== null || skill === undefined) {
-      return skill[0].AttributeId;
-    }
-  }
+  // const skills = await getSkills();
+  // console.log("Skill demandé (skillName): " + skillName);
+  // console.log("Skills récupérés: " + JSON.stringify(skills));
+  // if (skills !== null) {
+  //   const skill = skills.Result.filter(
+  //     (attribute) => attribute.AttributeName === skillName
+  //   );
+  //   if (skill !== null || skill === undefined) {
+  //     return skill[0].AttributeId;
+  //   }
+  // }
 
   //TODO Handle ERRORS
   return null;
