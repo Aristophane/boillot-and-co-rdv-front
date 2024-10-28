@@ -13,7 +13,7 @@ export const handler = async (event, context) => {
 
   const skillId = await getSkillIdFromName(skillType);
   const scheduleJob = await scheduleAssistantJobs(
-    skillId,
+    skillType,
     latitude,
     longitude,
     jobId,
@@ -27,7 +27,7 @@ export const handler = async (event, context) => {
 };
 
 const scheduleAssistantJobs = async (
-  skillId,
+  skillType,
   latitude,
   longitude,
   jobId,
@@ -44,8 +44,13 @@ const scheduleAssistantJobs = async (
     const endDate = getCurrentDateWithOffset(dayShift + 8);
     //TODO ATTENTION version sans skillId
     // const apiUrlForSchedulingAssistant = `${BIGCHANGE_BASE_API}${SCHEDULE_JOB_ASSISTANT_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}&skills=${skillId}`;
-    const apiUrlForSchedulingAssistant = `${BIGCHANGE_BASE_API}${SCHEDULE_JOB_ASSISTANT_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}`;
-    
+    let apiUrlForSchedulingAssistant = "";
+    console.log("Faux skill type remonté: " + skillType);
+    if (skillType != "Remplacement de BEC") {
+      apiUrlForSchedulingAssistant = `${BIGCHANGE_BASE_API}${SCHEDULE_JOB_ASSISTANT_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}`;
+    } else {
+      apiUrlForSchedulingAssistant = `${BIGCHANGE_BASE_API}${SCHEDULE_JOB_ASSISTANT_METHOD}&fromDate=${startDate}&toDate=${endDate}&latitude=${latitude}&longitude=${longitude}&jobId=${jobId}&when=2`;
+    }
     console.log(
       "THE URL FOR API SCHEDULING IS " + apiUrlForSchedulingAssistant
     );
